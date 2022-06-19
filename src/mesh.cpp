@@ -89,7 +89,7 @@ void Mesh::computeNormal() {
     TriangleIndex &triIndex = t[triId];
     Vector3f a = v[triIndex[1]] - v[triIndex[0]];
     Vector3f b = v[triIndex[2]] - v[triIndex[0]];
-    b = Vector3f::cross(a, b);
-    n[triId] = b / b.length();
+    b = a.cross(b);
+    n[triId] = b / b.norm();
   }
 }

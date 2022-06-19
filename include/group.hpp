@@ -1,12 +1,9 @@
 #ifndef GROUP_H
 #define GROUP_H
 
-#include <iostream>
 #include <vector>
 
-#include "hit.hpp"
 #include "object3d.hpp"
-#include "ray.hpp"
 
 class Group : public Object3D {
  public:

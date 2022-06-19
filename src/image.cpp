@@ -1,8 +1,8 @@
 #include "image.hpp"
 
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 // some helper functions for save & load
 

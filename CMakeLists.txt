@@ -7,7 +7,7 @@ ENDIF()
 
 FIND_PACKAGE(OpenMP REQUIRED)
 
-ADD_SUBDIRECTORY(deps/vecmath)
+ADD_SUBDIRECTORY(deps/eigen)
 
 SET(UE4_SOURCES
         src/image.cpp
@@ -22,7 +22,6 @@ SET(UE4_INCLUDES
         include/image.hpp
         include/material.hpp
         include/mesh.hpp
-        include/motion_blur.hpp
         include/object3d.hpp
         include/plane.hpp
         include/ray.hpp
@@ -33,9 +32,9 @@ SET(UE4_INCLUDES
         include/triangle.hpp
         include/utils.hpp)
 
-SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${UE4_SOURCES} ${UE4_INCLUDES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC vecmath OpenMP::OpenMP_CXX)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC eigen OpenMP::OpenMP_CXX)
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE include)

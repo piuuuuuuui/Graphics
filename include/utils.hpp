@@ -1,7 +1,12 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <Eigen/Geometry>
+#include <cmath>
+#include <iostream>
 #include <random>
+#include <unsupported/Eigen/MatrixFunctions>
+using Eigen::Vector2f, Eigen::Vector3f, Eigen::Vector4f, Eigen::Affine3f;
 
 static std::random_device rd;
 static std::mt19937 gen(rd());

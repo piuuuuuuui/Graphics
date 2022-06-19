@@ -1,8 +1,6 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
 
-#include <cstdio>
-
 #include "hit.hpp"
 #include "material.hpp"
 #include "ray.hpp"
@@ -35,12 +33,12 @@ class Object3D {
       float c = exp(-ray.translucency * hit.t);
       att = att * c + ray.translucentColor * ((1.f - c) / ray.translucency);
     }
-    color += material->emissiveColor * att;
+    color += material->emissiveColor.cwiseProduct(att);
 
     // Lambertian diffuse reflection
     float roughness = material->roughness;
-    att =
-        att * (Vector3f(1.f - roughness) + material->diffuseColor * roughness);
+    att = att.cwiseProduct(Vector3f::Constant(1.f - roughness) +
+                           material->diffuseColor * roughness);
     if (isNegligible(att)) return false;
     Vector3f normal = getNormal(hit.normal, hit.u, hit.v);
     dir = dir * (1.f - roughness) +
@@ -49,16 +47,15 @@ class Object3D {
     // reflection & refraction
     float n = material->refractiveIndex, lambda = material->translucency;
     if (RAND_U < material->transparency && 0 < n) {
-      float cosI = -Vector3f::dot(dir, normal);
+      float cosI = -dir.dot(normal);
       if (cosI < 0) {
         cosI = -cosI;
         normal = -normal;
         n = 1 / n;
         lambda = -lambda;
       }
-      Vector3f sinI = Vector3f::cross(dir, normal),
-               sinT = Vector3f::cross(normal, sinI) / n;
-      float squaredCosT = 1 - sinT.squaredLength();
+      Vector3f sinI = dir.cross(normal), sinT = normal.cross(sinI) / n;
+      float squaredCosT = 1 - sinT.squaredNorm();
       if (squaredCosT > 0) {
         float cosT = sqrt(squaredCosT),
               RS = pow((n * cosI - cosT) / (n * cosI + cosT), 2),
@@ -66,7 +63,7 @@ class Object3D {
               R = (RS + RP) / 2;  // Fresnel reflectivity
         if (R < RAND_U) {
           // refraction
-          att = att * material->refractiveColor;
+          att = att.cwiseProduct(material->refractiveColor);
           if (isNegligible(att)) return false;
           dir = sinT - normal * cosT;
           ray.refractiveIndex *= n;
@@ -78,9 +75,9 @@ class Object3D {
       }
     }
     // specular reflection
-    att = att * material->specularColor;
+    att = att.cwiseProduct(material->specularColor);
     if (isNegligible(att)) return false;
-    dir -= normal * 2 * Vector3f::dot(normal, dir);
+    dir -= normal * 2 * normal.dot(dir);
     return true;
   }
 

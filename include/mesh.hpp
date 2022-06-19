@@ -3,9 +3,6 @@
 
 #include <vector>
 
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "object3d.hpp"
 #include "triangle.hpp"
 
 class Mesh : public Object3D {

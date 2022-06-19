@@ -1,13 +1,7 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-#include <vecmath.h>
-
-#include <cmath>
-#include <iostream>
-
 #include "object3d.hpp"
-using namespace std;
 
 class Triangle : public Object3D {
  public:
@@ -20,19 +14,18 @@ class Triangle : public Object3D {
     vertices[1] = b;
     vertices[2] = c;
     // counterclockwise orientation
-    normal = Vector3f::cross(b - a, c - a).normalized();
-    d = Vector3f::dot(normal, a);
+    normal = (b - a).cross(c - a).normalized();
+    d = normal.dot(a);
   }
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
-    float cos = -Vector3f::dot(normal, r.direction);
-    float t = (Vector3f::dot(normal, r.origin) - d) / cos;
+    float cos = -normal.dot(r.direction);
+    float t = (normal.dot(r.origin) - d) / cos;
     if (t < h.t && t > tmin) {
       Vector3f p = r.pointAtParameter(t);
       Vector3f a = vertices[0] - p, b = vertices[1] - p, c = vertices[2] - p;
-      if (Vector3f::dot(normal, Vector3f::cross(a, b)) >= 0 &&
-          Vector3f::dot(normal, Vector3f::cross(b, c)) >= 0 &&
-          Vector3f::dot(normal, Vector3f::cross(c, a)) >= 0) {
+      if (normal.dot(a.cross(b)) >= 0 && normal.dot(b.cross(c)) >= 0 &&
+          normal.dot(c.cross(a)) >= 0) {
         h.t = t;
         h.point = r.pointAtParameter(t);
         h.normal = normal;

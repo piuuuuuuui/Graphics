@@ -1,11 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <float.h>
-#include <vecmath.h>
-
-#include <cmath>
-
 #include "ray.hpp"
 #include "utils.hpp"
 
@@ -15,8 +10,8 @@ class Camera {
          int imgW, int imgH) {
     this->center = center;
     this->direction = direction.normalized();
-    this->horizontal = Vector3f::cross(this->direction, up).normalized();
-    this->up = Vector3f::cross(this->horizontal, this->direction);
+    this->horizontal = this->direction.cross(up).normalized();
+    this->up = this->horizontal.cross(this->direction);
     this->width = imgW;
     this->height = imgH;
   }
@@ -86,7 +81,7 @@ class RealCamera : public Camera {
     // angle is in radian.
     o = Vector2f(width / 2.f, height / 2.f);
     f = this->direction * (height / (tan(angle / 2) * 2));
-    k = f.length() / d;
+    k = f.norm() / d;
   }
 
   Ray generateRay(const Vector2f &point) override {

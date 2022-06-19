@@ -1,10 +1,6 @@
 #ifndef PLANE_H
 #define PLANE_H
 
-#include <vecmath.h>
-
-#include <cmath>
-
 #include "object3d.hpp"
 
 class Plane : public Object3D {
@@ -12,7 +8,7 @@ class Plane : public Object3D {
   Plane() = delete;
 
   Plane(const Vector3f &normal, float d, Material *m) : Object3D(m) {
-    float norm = normal.length();
+    float norm = normal.norm();
     this->n = normal / norm;
     this->d = d / norm;
   }
@@ -20,8 +16,8 @@ class Plane : public Object3D {
   ~Plane() override = default;
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
-    float cos = -Vector3f::dot(n, r.direction);
-    float t = (Vector3f::dot(n, r.origin) - d) / cos;
+    float cos = -n.dot(r.direction);
+    float t = (n.dot(r.origin) - d) / cos;
     if (t < h.t && t > tmin) {
       h.t = t;
       h.point = r.pointAtParameter(t);

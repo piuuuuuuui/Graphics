@@ -1,10 +1,6 @@
 #ifndef HIT_H
 #define HIT_H
 
-#include <vecmath.h>
-
-#include <random>
-
 #include "ray.hpp"
 
 class Material;
@@ -12,7 +8,7 @@ class Material;
 struct Hit {
   float t = __FLT_MAX__;
   float u = 0.f, v = 0.f;
-  Vector3f point = 0.f, normal = 0.f;
+  Vector3f point = Vector3f::Zero(), normal = Vector3f::Zero();
   Material *material = nullptr;
 };
 

@@ -4,7 +4,6 @@
 #include <omp.h>  // OpenMP
 
 #include <chrono>
-#include <iostream>
 
 #include "camera.hpp"
 #include "group.hpp"
@@ -48,12 +47,12 @@ class PTRenderer {
   Vector3f getColor(const Ray& camRay) {
     Group* group = scene.getGroup();
     Ray ray = camRay;
-    Vector3f color(0.f);
+    Vector3f color(Vector3f::Zero());
     for (int depth = 0; depth < MAX_TRACE_DEPTH; depth++) {
       Hit hit;
       Object3D* obj = nullptr;
       if (!group->intersect(ray, hit, obj, 1e-5))
-        return color + ray.attenuation * scene.getBackgroundColor();
+        return color + ray.attenuation.cwiseProduct(scene.getBackgroundColor());
       if (!obj->getNextRay(hit, ray, color)) break;
     }
     return color;

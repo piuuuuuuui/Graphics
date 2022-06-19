@@ -11,6 +11,8 @@ CTestTestfile.cmake
 _deps
 
 .vscode/
+bin/
+build/
 mesh/
 output/
 testcases/

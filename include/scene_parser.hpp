@@ -1,13 +1,13 @@
 #ifndef SCENE_PARSER_H
 #define SCENE_PARSER_H
 
-#include <vecmath.h>
-
 #include <cassert>
+
+#include "utils.hpp"
 
 class Camera;
 class Material;
-class MotionBlur;
+// class MotionBlur;
 class Object3D;
 class Group;
 class Sphere;
@@ -61,7 +61,7 @@ class SceneParser {
   Triangle *parseTriangle();
   Mesh *parseTriangleMesh();
   Transform *parseTransform();
-  Object3D *parseMotionBlur();
+  // Object3D *parseMotionBlur();
 
   int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 
