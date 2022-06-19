@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   for (int argNum = 1; argNum < argc; ++argNum) {
-    std::cout << "Argument " << argNum << " is: " << argv[argNum] << std::endl;
+    cout << "Argument " << argNum << " is: " << argv[argNum] << endl;
   }
 
   if (argc != 3) {

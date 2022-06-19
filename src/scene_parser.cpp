@@ -248,8 +248,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
     answer = (Object3D *)parseTriangleMesh();
   } else if (!strcmp(token, "Transform")) {
     answer = (Object3D *)parseTransform();
-    // } else if (!strcmp(token, "MotionBlur")) {
-    //   answer = (Object3D *)parseMotionBlur();
+  } else if (!strcmp(token, "MotionBlur")) {
+    answer = (Object3D *)parseMotionBlur();
   } else if (!strcmp(token, "ObjectIndex")) {
     int index = readInt();
     assert(index >= 0 && index <= getNumObjects());
@@ -469,21 +469,21 @@ Transform *SceneParser::parseTransform() {
     } else if (!strcmp(token, "Translate")) {
       tr.translate(readVector3f());
     } else if (!strcmp(token, "XRotate")) {
-      tr.rotate(Eigen::AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitX()));
+      tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitX()));
     } else if (!strcmp(token, "YRotate")) {
-      tr.rotate(Eigen::AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitY()));
+      tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitY()));
     } else if (!strcmp(token, "ZRotate")) {
-      tr.rotate(Eigen::AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitZ()));
+      tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitZ()));
     } else if (!strcmp(token, "Rotate")) {
       getToken(token);
       assert(!strcmp(token, "{"));
       Vector3f axis = readVector3f();
       float angle = Deg2Rad(readFloat());
-      tr.rotate(Eigen::AngleAxisf(angle, axis));
+      tr.rotate(AngleAxisf(angle, axis));
       getToken(token);
       assert(!strcmp(token, "}"));
     } else if (!strcmp(token, "Matrix4f")) {
-      Eigen::Matrix4f m;
+      Matrix4f m;
       getToken(token);
       assert(!strcmp(token, "{"));
       for (int j = 0; j < 4; j++) {
@@ -509,34 +509,9 @@ Transform *SceneParser::parseTransform() {
   return new Transform(tr, object);
 }
 
-// Object3D *SceneParser::parseMotionBlur() {
-//   char token[MAX_PARSER_TOKEN_LENGTH];
-//   MotionBlur *motion_blur = nullptr;
-//   Object3D *object = nullptr;
-//   getToken(token);
-//   assert(!strcmp(token, "{"));
-
-//   getToken(token);
-//   object = parseObject(token);
-//   assert(object != nullptr);
-
-//   getToken(token);
-//   if (!strcmp(token, "Translation")) {
-//     motion_blur = new TranslationBlur(readVector3f(), object);
-//   } else if (!strcmp(token, "Rotation")) {
-//     motion_blur = new RotationBlur(readVector3f(), object);
-//   } else if (!strcmp(token, "Scalation")) {
-//     motion_blur = new ScalationBlur(readVector3f(), object);
-//   } else {
-//     assert(!strcmp(token, "}"));
-//     return object;
-//   }
-//   assert(motion_blur != nullptr);
-
-//   getToken(token);
-//   assert(!strcmp(token, "}"));
-//   return motion_blur;
-// }
+MotionBlur *SceneParser::parseMotionBlur() {
+  return new MotionBlur(move(*parseTransform()));
+}
 
 // ====================================================================
 // ====================================================================

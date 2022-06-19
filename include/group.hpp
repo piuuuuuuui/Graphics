@@ -7,10 +7,9 @@
 
 class Group : public Object3D {
  public:
-  Group() : objects(std::vector<Object3D *>()) {}
+  Group() : objects(vector<Object3D *>()) {}
 
-  explicit Group(int num_objects)
-      : objects(std::vector<Object3D *>(num_objects)) {}
+  explicit Group(int num_objects) : objects(vector<Object3D *>(num_objects)) {}
 
   ~Group() override {}
 
@@ -26,7 +25,7 @@ class Group : public Object3D {
   int getGroupSize() { return objects.size(); }
 
  private:
-  std::vector<Object3D *> objects;
+  vector<Object3D *> objects;
 };
 
 #endif

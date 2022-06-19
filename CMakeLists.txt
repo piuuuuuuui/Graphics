@@ -13,7 +13,8 @@ SET(UE4_SOURCES
         src/image.cpp
         src/main.cpp
         src/mesh.cpp
-        src/scene_parser.cpp)
+        src/scene_parser.cpp
+)
 
 SET(UE4_INCLUDES
         include/camera.hpp
@@ -30,7 +31,8 @@ SET(UE4_INCLUDES
         include/sphere.hpp
         include/transform.hpp
         include/triangle.hpp
-        include/utils.hpp)
+        include/utils.hpp
+)
 
 SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

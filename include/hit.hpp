@@ -12,7 +12,7 @@ struct Hit {
   Material *material = nullptr;
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Hit &h) {
+inline ostream &operator<<(ostream &os, const Hit &h) {
   os << "Hit <" << h.t << ", " << h.normal << ">";
   return os;
 }

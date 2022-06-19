@@ -20,9 +20,9 @@ class Mesh : public Object3D {
     int x[3]{};
   };
 
-  std::vector<Vector3f> v;
-  std::vector<TriangleIndex> t;
-  std::vector<Vector3f> n;
+  vector<Vector3f> v;
+  vector<TriangleIndex> t;
+  vector<Vector3f> n;
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override;
 
  private:

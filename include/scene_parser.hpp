@@ -7,7 +7,7 @@
 
 class Camera;
 class Material;
-// class MotionBlur;
+class MotionBlur;
 class Object3D;
 class Group;
 class Sphere;
@@ -61,7 +61,7 @@ class SceneParser {
   Triangle *parseTriangle();
   Mesh *parseTriangleMesh();
   Transform *parseTransform();
-  // Object3D *parseMotionBlur();
+  MotionBlur *parseMotionBlur();
 
   int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 

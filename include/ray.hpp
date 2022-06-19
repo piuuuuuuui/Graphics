@@ -14,13 +14,16 @@ class Ray {
 
   Vector3f origin;
   Vector3f direction;
+
+  int frame = 0;
+
   float refractiveIndex = 1.f;
   float translucency = 0.f;
   Vector3f translucentColor = Vector3f::Ones();
   Vector3f attenuation = Vector3f::Ones();
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Ray &r) {
+inline ostream &operator<<(ostream &os, const Ray &r) {
   os << "Ray <" << r.origin << ", " << r.direction << ">";
   return os;
 }
