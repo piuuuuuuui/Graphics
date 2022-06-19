@@ -12,8 +12,7 @@ class Material {
   float transparency = 0.f;
   float refractiveIndex = 1.f;
   Vector3f refractiveColor = Vector3f::Ones();
-  float translucency = 0.f;
-  Vector3f translucentColor = Vector3f::Zero();
+  Matrix4f translucency = Matrix4f::Zero();
 };
 
 #endif  // MATERIAL_H

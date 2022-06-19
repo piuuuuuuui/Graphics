@@ -43,15 +43,14 @@ class PTRenderer {
   Vector3f getColor(const Ray& camRay) {
     Group* group = scene.getGroup();
     Ray ray = camRay;
-    Vector3f color(Vector3f::Zero());
     for (int depth = 0; depth < MAX_DEPTH; depth++) {
       Hit hit;
       Object3D* obj = nullptr;
       if (!group->intersect(ray, hit, obj, 1e-5))
-        return color + ray.attenuation.cwiseProduct(scene.getBackgroundColor());
-      if (!obj->getNextRay(hit, ray, color)) break;
+        return ray.colorTrans * scene.getBackgroundColor();
+      if (!obj->getNextRay(hit, ray)) break;
     }
-    return color;
+    return ray.colorTrans.translation();
   }
 
  private:

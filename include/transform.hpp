@@ -34,7 +34,8 @@ class MotionBlur : public Transform {
  public:
   MotionBlur() = delete;
 
-  MotionBlur(const Transform &transform) : Transform(transform) {
+  MotionBlur(const Affine3f &transform, Object3D *obj)
+      : Transform(transform, obj) {
     MatrixPower<Matrix4f> tr_pow(tr.matrix()), inv_pow(inv.matrix());
     tr_pows.resize(NUM_ITERS);
     inv_pows.resize(NUM_ITERS);

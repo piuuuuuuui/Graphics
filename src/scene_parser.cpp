@@ -318,9 +318,13 @@ Material *SceneParser::parseMaterial() {
     } else if (strcmp(token, "refractiveColor") == 0) {
       answer->refractiveColor = readVector3f();
     } else if (strcmp(token, "translucency") == 0) {
-      answer->translucency = readFloat();
-    } else if (strcmp(token, "translucentColor") == 0) {
-      answer->translucentColor = readVector3f();
+      getToken(token);
+      assert(!strcmp(token, "{"));
+      getToken(token);
+      Affine3f tr(Affine3f::Identity());
+      while (parseMatrix4f(token, tr)) getToken(token);
+      assert(!strcmp(token, "}"));
+      answer->translucency = tr.matrix().log();
     } else if (strcmp(token, "texture") == 0) {
       // Optional: read in texture and draw it.
       getToken(filename);
@@ -461,47 +465,10 @@ Transform *SceneParser::parseTransform() {
   // transform in the list is the last applied to the object)
   getToken(token);
 
-  while (true) {
-    if (!strcmp(token, "Scale")) {
-      tr.scale(readVector3f());
-    } else if (!strcmp(token, "UniformScale")) {
-      tr.scale(readFloat());
-    } else if (!strcmp(token, "Translate")) {
-      tr.translate(readVector3f());
-    } else if (!strcmp(token, "XRotate")) {
-      tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitX()));
-    } else if (!strcmp(token, "YRotate")) {
-      tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitY()));
-    } else if (!strcmp(token, "ZRotate")) {
-      tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitZ()));
-    } else if (!strcmp(token, "Rotate")) {
-      getToken(token);
-      assert(!strcmp(token, "{"));
-      Vector3f axis = readVector3f();
-      float angle = Deg2Rad(readFloat());
-      tr.rotate(AngleAxisf(angle, axis));
-      getToken(token);
-      assert(!strcmp(token, "}"));
-    } else if (!strcmp(token, "Matrix4f")) {
-      Matrix4f m;
-      getToken(token);
-      assert(!strcmp(token, "{"));
-      for (int j = 0; j < 4; j++) {
-        for (int i = 0; i < 4; i++) {
-          m << readFloat();
-        }
-      }
-      getToken(token);
-      assert(!strcmp(token, "}"));
-      tr *= m;
-    } else {
-      // otherwise this must be an object,
-      // and there are no more transformations
-      object = parseObject(token);
-      break;
-    }
-    getToken(token);
-  }
+  while (parseMatrix4f(token, tr)) getToken(token);
+  // this must be an object,
+  // and there are no more transformations
+  object = parseObject(token);
 
   assert(object != nullptr);
   getToken(token);
@@ -510,7 +477,25 @@ Transform *SceneParser::parseTransform() {
 }
 
 MotionBlur *SceneParser::parseMotionBlur() {
-  return new MotionBlur(move(*parseTransform()));
+  char token[MAX_PARSER_TOKEN_LENGTH];
+  Affine3f tr(Affine3f::Identity());
+  Object3D *object = nullptr;
+  getToken(token);
+  assert(!strcmp(token, "{"));
+  // read in transformations:
+  // apply to the LEFT side of the current matrix (so the first
+  // transform in the list is the last applied to the object)
+  getToken(token);
+
+  while (parseMatrix4f(token, tr)) getToken(token);
+  // this must be an object,
+  // and there are no more transformations
+  object = parseObject(token);
+
+  assert(object != nullptr);
+  getToken(token);
+  assert(!strcmp(token, "}"));
+  return new MotionBlur(tr, object);
 }
 
 // ====================================================================
@@ -535,6 +520,46 @@ Vector3f SceneParser::readVector3f() {
     assert(0);
   }
   return Vector3f(x, y, z);
+}
+
+bool SceneParser::parseMatrix4f(char token[MAX_PARSER_TOKEN_LENGTH],
+                                Affine3f &tr) {
+  if (!strcmp(token, "Scale")) {
+    tr.scale(readVector3f());
+  } else if (!strcmp(token, "UniformScale")) {
+    tr.scale(readFloat());
+  } else if (!strcmp(token, "Translate")) {
+    tr.translate(readVector3f());
+  } else if (!strcmp(token, "XRotate")) {
+    tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitX()));
+  } else if (!strcmp(token, "YRotate")) {
+    tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitY()));
+  } else if (!strcmp(token, "ZRotate")) {
+    tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitZ()));
+  } else if (!strcmp(token, "Rotate")) {
+    getToken(token);
+    assert(!strcmp(token, "{"));
+    Vector3f axis = readVector3f().normalized();
+    float angle = Deg2Rad(readFloat());
+    tr.rotate(AngleAxisf(angle, axis));
+    getToken(token);
+    assert(!strcmp(token, "}"));
+  } else if (!strcmp(token, "Matrix4f")) {
+    Matrix4f m;
+    getToken(token);
+    assert(!strcmp(token, "{"));
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        m(i, j) = readFloat();
+      }
+    }
+    getToken(token);
+    assert(!strcmp(token, "}"));
+    tr *= m;
+  } else {
+    return false;
+  }
+  return true;
 }
 
 float SceneParser::readFloat() {

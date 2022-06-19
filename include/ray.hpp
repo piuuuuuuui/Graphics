@@ -18,9 +18,8 @@ class Ray {
   int frame = 0;
 
   float refractiveIndex = 1.f;
-  float translucency = 0.f;
-  Vector3f translucentColor = Vector3f::Ones();
-  Vector3f attenuation = Vector3f::Ones();
+  Matrix4f translucency = Matrix4f::Zero();
+  Affine3f colorTrans = Affine3f::Identity();
 };
 
 inline ostream &operator<<(ostream &os, const Ray &r) {

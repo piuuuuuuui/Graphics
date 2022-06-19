@@ -66,6 +66,7 @@ class SceneParser {
   int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 
   Vector3f readVector3f();
+  bool parseMatrix4f(char token[MAX_PARSER_TOKEN_LENGTH], Affine3f &tr);
 
   float readFloat();
   int readInt();
