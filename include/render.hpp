@@ -32,7 +32,7 @@ class PTRenderer {
           color = (color * i + getColor(ray)) / (i + 1);
         }
       }
-      if ((i & (i + 1)) == 0) image.SaveImage("output/scene00.bmp");
+      image.SaveImage("output/0.bmp");
       auto end = high_resolution_clock::now();
       float time_ms = duration_cast<nanoseconds>(end - begin).count() / 1e6;
       cout << time_ms << "ms" << endl;

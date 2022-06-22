@@ -33,7 +33,7 @@ class Object3D {
     float roughness = material->roughness;
     tr.scale(Vector3f::Constant(1.f - roughness) +
              material->diffuseColor * roughness);
-    if ((tr * Vector4f::Ones()).maxCoeff() < 1e-2) return false;
+    if ((tr.linear() * Vector3f::Ones()).maxCoeff() < 1e-2) return false;
     Vector3f normal = getNormal(hit.normal, hit.u, hit.v);
     dir = dir * (1.f - roughness) +
           (RAND_VEC - normal).normalized() * roughness;  // to fix
@@ -59,7 +59,7 @@ class Object3D {
         if (R < RAND_U) {
           // refraction
           tr.scale(material->refractiveColor);
-          if ((tr * Vector3f::Ones()).maxCoeff() < 1e-2) return false;
+          if ((tr.linear() * Vector3f::Ones()).maxCoeff() < 1e-2) return false;
           dir = sinT - normal * cosT;
           ray.refractiveIndex *= n;
           ray.translucency += m;
@@ -69,7 +69,7 @@ class Object3D {
     }
     // specular reflection
     tr.scale(material->specularColor);
-    if ((tr * Vector4f::Ones()).maxCoeff() < 1e-2) return false;
+    if ((tr.linear() * Vector3f::Ones()).maxCoeff() < 1e-2) return false;
     dir -= normal * 2 * normal.dot(dir);
     return true;
   }

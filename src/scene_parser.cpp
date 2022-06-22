@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "camera.hpp"
+#include "fractal.hpp"
 #include "group.hpp"
 #include "material.hpp"
 #include "mesh.hpp"
@@ -223,7 +224,7 @@ void SceneParser::parseObjects() {
     if (!strcmp(token, "MaterialIndex")) {
       // change the current material
       int index = readInt();
-      assert(index >= 0 && index <= getNumMaterials());
+      assert(index >= 0 && index < getNumMaterials());
       current_material = getMaterial(index);
     } else {
       objects[count] = parseObject(token);
@@ -250,9 +251,11 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
     answer = (Object3D *)parseTransform();
   } else if (!strcmp(token, "MotionBlur")) {
     answer = (Object3D *)parseMotionBlur();
+  } else if (!strcmp(token, "Fractal")) {
+    answer = (Object3D *)parseFractal();
   } else if (!strcmp(token, "ObjectIndex")) {
     int index = readInt();
-    assert(index >= 0 && index <= getNumObjects());
+    assert(index >= 0 && index < getNumObjects());
     answer = getObject(index);
   } else {
     printf("Unknown token in parseObject: '%s'\n", token);
@@ -355,18 +358,18 @@ Group *SceneParser::parseGroup() {
   // read in the number of objects
   getToken(token);
   assert(!strcmp(token, "numObjects"));
-  int num_objects = readInt();
+  int num_group_objects = readInt();
 
-  auto *answer = new Group(num_objects);
+  auto *answer = new Group(num_group_objects);
 
   // read in the objects
   int count = 0;
-  while (num_objects > count) {
+  while (num_group_objects > count) {
     getToken(token);
     if (!strcmp(token, "MaterialIndex")) {
       // change the current material
       int index = readInt();
-      assert(index >= 0 && index <= getNumMaterials());
+      assert(index >= 0 && index < getNumMaterials());
       current_material = getMaterial(index);
     } else {
       Object3D *object = parseObject(token);
@@ -496,6 +499,43 @@ MotionBlur *SceneParser::parseMotionBlur() {
   getToken(token);
   assert(!strcmp(token, "}"));
   return new MotionBlur(tr, object);
+}
+
+Fractal *SceneParser::parseFractal() {
+  char token[MAX_PARSER_TOKEN_LENGTH];
+  getToken(token);
+  assert(!strcmp(token, "{"));
+
+  // read in the number of transforms
+  getToken(token);
+  assert(!strcmp(token, "numTransforms"));
+  int num_transforms = readInt();
+  vector<Affine3f> trs;
+
+  // read in the transforms
+  int count = 0;
+  while (num_transforms > count) {
+    Affine3f tr(Affine3f::Identity());
+    getToken(token);
+    assert(!strcmp(token, "Transform"));
+    getToken(token);
+    assert(!strcmp(token, "{"));
+    getToken(token);
+    while (parseMatrix4f(token, tr)) getToken(token);
+    assert(!strcmp(token, "}"));
+    trs.push_back(tr);
+    count++;
+  }
+
+  // read in the object
+  Object3D *object = nullptr;
+  getToken(token);
+  object = parseObject(token);
+  assert(object != nullptr);
+
+  getToken(token);
+  assert(!strcmp(token, "}"));
+  return new Fractal(trs, object);
 }
 
 // ====================================================================

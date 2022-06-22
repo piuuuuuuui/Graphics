@@ -18,6 +18,7 @@ SET(UE4_SOURCES
 
 SET(UE4_INCLUDES
         include/camera.hpp
+        include/fractal.hpp
         include/group.hpp
         include/hit.hpp
         include/image.hpp
@@ -38,5 +39,5 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${UE4_SOURCES} ${UE4_INCLUDES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC eigen OpenMP::OpenMP_CXX)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE eigen OpenMP::OpenMP_CXX)
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE include)

@@ -6,6 +6,7 @@
 #include "utils.hpp"
 
 class Camera;
+class Fractal;
 class Material;
 class MotionBlur;
 class Object3D;
@@ -62,6 +63,7 @@ class SceneParser {
   Mesh *parseTriangleMesh();
   Transform *parseTransform();
   MotionBlur *parseMotionBlur();
+  Fractal *parseFractal();
 
   int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 
