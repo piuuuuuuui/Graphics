@@ -15,8 +15,7 @@
 
 using namespace std;
 using namespace chrono;
-using Eigen::Vector2f, Eigen::Vector3f, Eigen::Vector4f, Eigen::Affine3f,
-    Eigen::Matrix4f, Eigen::MatrixPower, Eigen::AngleAxisf, Eigen::AlignedBox3f;
+using Eigen::Vector2f, Eigen::Vector3f, Eigen::Affine3f, Eigen::Matrix4f;
 
 const int NUM_ITERS = 256;
 const int MAX_DEPTH = 16;

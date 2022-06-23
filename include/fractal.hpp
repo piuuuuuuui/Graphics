@@ -15,7 +15,7 @@ class Fractal : public Group {
     bbox = obj->getBBox();
     for (auto tr : transforms) {
       objects.push_back(new Transform(tr, this));
-      vector<Vector4f> cols;
+      vector<Eigen::Vector4f> cols;
       Eigen::EigenSolver<Matrix4f> es(tr.matrix());
       for (int i = 0; i < 4; i++) {
         if (abs(es.eigenvalues()[i] - 1.f) < 1e-5) {

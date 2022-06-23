@@ -84,13 +84,13 @@ class Object3D {
     return true;
   }
 
-  const AlignedBox3f &getBBox() const { return bbox; }
+  const Eigen::AlignedBox3f &getBBox() const { return bbox; }
 
  protected:
   virtual Vector3f getNormal(const Vector3f &n, float, float) { return n; }
 
   Material *material;
-  AlignedBox3f bbox;
+  Eigen::AlignedBox3f bbox;
 };
 
 #endif

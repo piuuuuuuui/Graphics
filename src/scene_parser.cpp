@@ -604,17 +604,17 @@ bool SceneParser::parseMatrix4f(char token[MAX_PARSER_TOKEN_LENGTH],
   } else if (!strcmp(token, "Translate")) {
     tr.translate(readVector3f());
   } else if (!strcmp(token, "XRotate")) {
-    tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitX()));
+    tr.rotate(Eigen::AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitX()));
   } else if (!strcmp(token, "YRotate")) {
-    tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitY()));
+    tr.rotate(Eigen::AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitY()));
   } else if (!strcmp(token, "ZRotate")) {
-    tr.rotate(AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitZ()));
+    tr.rotate(Eigen::AngleAxisf(Deg2Rad(readFloat()), Vector3f::UnitZ()));
   } else if (!strcmp(token, "Rotate")) {
     getToken(token);
     assert(!strcmp(token, "{"));
     Vector3f axis = readVector3f().normalized();
     float angle = Deg2Rad(readFloat());
-    tr.rotate(AngleAxisf(angle, axis));
+    tr.rotate(Eigen::AngleAxisf(angle, axis));
     getToken(token);
     assert(!strcmp(token, "}"));
   } else if (!strcmp(token, "Matrix4f")) {
