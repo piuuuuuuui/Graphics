@@ -29,7 +29,7 @@ class Triangle : public Object3D {
       if (normal.dot(a.cross(b)) >= 0 && normal.dot(b.cross(c)) >= 0 &&
           normal.dot(c.cross(a)) >= 0) {
         h.t = t;
-        h.point = r.pointAtParameter(t);
+        h.point = p;
         h.normal = normal;
         h.material = material;
         obj = this;

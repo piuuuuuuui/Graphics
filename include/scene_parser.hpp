@@ -6,6 +6,7 @@
 #include "utils.hpp"
 
 class Camera;
+class Disk;
 class Fractal;
 class Material;
 class MotionBlur;
@@ -13,6 +14,7 @@ class Object3D;
 class Group;
 class Sphere;
 class Plane;
+class Portal;
 class Triangle;
 class Transform;
 class Mesh;
@@ -59,11 +61,13 @@ class SceneParser {
   Group *parseGroup();
   Sphere *parseSphere();
   Plane *parsePlane();
+  Disk *parseDisk();
   Triangle *parseTriangle();
   Mesh *parseTriangleMesh();
   Transform *parseTransform();
   MotionBlur *parseMotionBlur();
   Fractal *parseFractal();
+  Portal *parsePortal();
 
   int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 

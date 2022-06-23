@@ -5,12 +5,14 @@
 #include <iostream>
 
 #include "camera.hpp"
+#include "disk.hpp"
 #include "fractal.hpp"
 #include "group.hpp"
 #include "material.hpp"
 #include "mesh.hpp"
 #include "object3d.hpp"
 #include "plane.hpp"
+#include "portal.hpp"
 #include "sphere.hpp"
 #include "transform.hpp"
 #include "triangle.hpp"
@@ -243,6 +245,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
     answer = (Object3D *)parseSphere();
   } else if (!strcmp(token, "Plane")) {
     answer = (Object3D *)parsePlane();
+  } else if (!strcmp(token, "Disk")) {
+    answer = (Object3D *)parseDisk();
   } else if (!strcmp(token, "Triangle")) {
     answer = (Object3D *)parseTriangle();
   } else if (!strcmp(token, "TriangleMesh")) {
@@ -253,6 +257,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
     answer = (Object3D *)parseMotionBlur();
   } else if (!strcmp(token, "Fractal")) {
     answer = (Object3D *)parseFractal();
+  } else if (!strcmp(token, "Portal")) {
+    answer = (Object3D *)parsePortal();
   } else if (!strcmp(token, "ObjectIndex")) {
     int index = readInt();
     assert(index >= 0 && index < getNumObjects());
@@ -420,6 +426,25 @@ Plane *SceneParser::parsePlane() {
   return new Plane(normal, offset, current_material);
 }
 
+Disk *SceneParser::parseDisk() {
+  char token[MAX_PARSER_TOKEN_LENGTH];
+  getToken(token);
+  assert(!strcmp(token, "{"));
+  getToken(token);
+  assert(!strcmp(token, "center"));
+  Vector3f center = readVector3f();
+  getToken(token);
+  assert(!strcmp(token, "normal"));
+  Vector3f normal = readVector3f();
+  getToken(token);
+  assert(!strcmp(token, "radius"));
+  float radius = readFloat();
+  getToken(token);
+  assert(!strcmp(token, "}"));
+  assert(current_material != nullptr);
+  return new Disk(center, normal, radius, current_material);
+}
+
 Triangle *SceneParser::parseTriangle() {
   char token[MAX_PARSER_TOKEN_LENGTH];
   getToken(token);
@@ -485,16 +510,9 @@ MotionBlur *SceneParser::parseMotionBlur() {
   Object3D *object = nullptr;
   getToken(token);
   assert(!strcmp(token, "{"));
-  // read in transformations:
-  // apply to the LEFT side of the current matrix (so the first
-  // transform in the list is the last applied to the object)
   getToken(token);
-
   while (parseMatrix4f(token, tr)) getToken(token);
-  // this must be an object,
-  // and there are no more transformations
   object = parseObject(token);
-
   assert(object != nullptr);
   getToken(token);
   assert(!strcmp(token, "}"));
@@ -536,6 +554,21 @@ Fractal *SceneParser::parseFractal() {
   getToken(token);
   assert(!strcmp(token, "}"));
   return new Fractal(trs, object);
+}
+
+Portal *SceneParser::parsePortal() {
+  char token[MAX_PARSER_TOKEN_LENGTH];
+  Affine3f tr(Affine3f::Identity());
+  Object3D *object = nullptr;
+  getToken(token);
+  assert(!strcmp(token, "{"));
+  getToken(token);
+  while (parseMatrix4f(token, tr)) getToken(token);
+  object = parseObject(token);
+  assert(object != nullptr);
+  getToken(token);
+  assert(!strcmp(token, "}"));
+  return new Portal(tr, object);
 }
 
 // ====================================================================
