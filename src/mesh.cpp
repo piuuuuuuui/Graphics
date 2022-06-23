@@ -53,6 +53,8 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
       Vector3f vec;
       ss >> vec[0] >> vec[1] >> vec[2];
       v.push_back(vec);
+      bbox.min() = bbox.min().cwiseMin(vec);
+      bbox.max() = bbox.max().cwiseMax(vec);
     } else if (tok == fTok) {
       if (line.find(bslash) != string::npos) {
         replace(line.begin(), line.end(), bslash, space);

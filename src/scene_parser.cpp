@@ -360,7 +360,7 @@ Group *SceneParser::parseGroup() {
   assert(!strcmp(token, "numObjects"));
   int num_group_objects = readInt();
 
-  auto *answer = new Group(num_group_objects);
+  auto *answer = new Group;
 
   // read in the objects
   int count = 0;
@@ -374,7 +374,7 @@ Group *SceneParser::parseGroup() {
     } else {
       Object3D *object = parseObject(token);
       assert(object != nullptr);
-      answer->addObject(count, object);
+      answer->addObject(object);
       count++;
     }
   }

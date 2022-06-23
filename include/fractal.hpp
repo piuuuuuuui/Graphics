@@ -3,29 +3,34 @@
 
 #include <vector>
 
+#include "group.hpp"
 #include "transform.hpp"
 
-class Fractal : public Object3D {
+class Fractal : public Group {
  public:
   Fractal() = delete;
 
-  Fractal(const vector<Affine3f> &transforms, Object3D *obj) : o(obj) {
-    for (auto tr : transforms) fragments.push_back(Transform(tr, this));
+  Fractal(const vector<Affine3f> &transforms, Object3D *obj) {
+    addObject(obj);
+    bbox = obj->getBBox();
+    for (auto tr : transforms) {
+      addObject(new Transform(tr, this));
+      vector<Vector3f> cols;
+      Eigen::EigenSolver<Matrix4f> es(tr.matrix());
+      for (int i = 0; i < 4; i++) {
+        if (abs(es.eigenvalues()[i] - 1.f) < 1e-5) {
+          auto col = es.eigenvectors().col(i).real();
+          cols.push_back(col.head<3>() / (col[3] + 1e-9));
+        }
+      }
+      Eigen::MatrixXf A(3, cols.size());
+      for (auto col : cols) A << col;
+      Eigen::VectorXf x = A.colPivHouseholderQr().solve(bbox.center());
+      bbox.extend(A * x / x.sum());
+    }
   }
 
   ~Fractal() {}
-
-  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj,
-                         float tmin) override {
-    bool result = o->intersect(r, h, obj, tmin);
-    for (auto fragment : fragments)
-      result |= fragment.intersect(r, h, obj, tmin);
-    return result;
-  }
-
- protected:
-  Object3D *o;  // un-transformed object
-  vector<Transform> fragments;
 };
 
 #endif  // FRACTAL_H

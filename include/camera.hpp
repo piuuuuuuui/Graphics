@@ -57,7 +57,7 @@ class PerspectiveCamera : public Camera {
 class OrthographicCamera : public Camera {
  public:
   OrthographicCamera(const Vector3f &center, const Vector3f &direction,
-                     const Vector3f &up, int imgW, int imgH, float scale = 1e-2)
+                     const Vector3f &up, int imgW, int imgH, float scale = 1)
       : Camera(center, direction, up, imgW, imgH), s(scale) {
     o = Vector2f(width / 2.f, height / 2.f);
   }

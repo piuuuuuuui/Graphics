@@ -16,6 +16,8 @@ class Triangle : public Object3D {
     // counterclockwise orientation
     normal = (b - a).cross(c - a).normalized();
     d = normal.dot(a);
+    bbox.min() = a.cwiseMin(b.cwiseMin(c));
+    bbox.max() = a.cwiseMax(b.cwiseMax(c));
   }
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {

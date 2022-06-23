@@ -12,6 +12,7 @@ class Transform : public Object3D {
   Transform(const Affine3f &transform, Object3D *obj) : o(obj) {
     tr = transform;
     inv = transform.inverse();
+    bbox = o->getBBox().transformed(tr);
   }
 
   ~Transform() {}

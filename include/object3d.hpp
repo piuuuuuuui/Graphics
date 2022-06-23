@@ -16,7 +16,18 @@ class Object3D {
   explicit Object3D(Material *material) { this->material = material; }
 
   // Intersect Ray with this object. If hit, store information in hit structure.
-  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) = 0;
+  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
+    // check if intersect with bbox
+    // should not change h and obj
+    float tmax = FLT_MAX;
+    for (int i = 0; i < 3; i++) {
+      float t1 = (bbox.min()[i] - r.origin[i]) / r.direction[i],
+            t2 = (bbox.max()[i] - r.origin[i]) / r.direction[i];
+      tmin = max(tmin, min(t1, t2));
+      tmax = min(tmax, max(t1, t2));
+    }
+    return tmin < tmax;
+  }
 
   virtual bool getNextRay(const Hit &hit, Ray &ray) {
     // printf("%p %s\n", this, typeid(*this).name());
@@ -36,7 +47,7 @@ class Object3D {
     if ((tr.linear() * Vector3f::Ones()).maxCoeff() < 1e-2) return false;
     Vector3f normal = getNormal(hit.normal, hit.u, hit.v);
     dir = dir * (1.f - roughness) +
-          (RAND_VEC - normal).normalized() * roughness;  // to fix
+          (RAND_VEC - normal).normalized() * roughness;  // TODO: fix
 
     // reflection & refraction
     float n = material->refractiveIndex;
@@ -74,10 +85,13 @@ class Object3D {
     return true;
   }
 
+  AlignedBox3f getBBox() { return bbox; }
+
  protected:
   virtual Vector3f getNormal(const Vector3f &n, float, float) { return n; }
 
   Material *material;
+  AlignedBox3f bbox;
 };
 
 #endif
