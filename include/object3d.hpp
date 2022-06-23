@@ -30,7 +30,6 @@ class Object3D {
   }
 
   virtual bool getNextRay(const Hit &hit, Ray &ray) {
-    // printf("%p %s\n", this, typeid(*this).name());
     ray.origin = hit.point;
 
     Vector3f &dir = ray.direction;
@@ -85,7 +84,7 @@ class Object3D {
     return true;
   }
 
-  AlignedBox3f getBBox() { return bbox; }
+  const AlignedBox3f &getBBox() const { return bbox; }
 
  protected:
   virtual Vector3f getNormal(const Vector3f &n, float, float) { return n; }

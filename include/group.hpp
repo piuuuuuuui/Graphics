@@ -26,7 +26,7 @@ class Group : public Object3D {
 
   int getGroupSize() { return objects.size(); }
 
- private:
+ protected:
   vector<Object3D *> objects;
 };
 
