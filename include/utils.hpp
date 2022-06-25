@@ -20,6 +20,7 @@ using Eigen::Vector2f, Eigen::Vector3f, Eigen::Affine3f, Eigen::Matrix4f;
 const int NUM_ITERS = 256;
 const int MAX_DEPTH = 16;
 const float FPS = NUM_ITERS / 1.f;
+const int NEWTON_ITERS = 8;
 
 static random_device rd;
 static mt19937 gen(rd());

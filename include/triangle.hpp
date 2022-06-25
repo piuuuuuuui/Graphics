@@ -23,20 +23,18 @@ class Triangle : public Object3D {
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
     float cos = -normal.dot(r.direction);
     float t = (normal.dot(r.origin) - d) / cos;
-    if (t < h.t && t > tmin) {
-      Vector3f p = r.pointAtParameter(t);
-      Vector3f a = vertices[0] - p, b = vertices[1] - p, c = vertices[2] - p;
-      if (normal.dot(a.cross(b)) >= 0 && normal.dot(b.cross(c)) >= 0 &&
-          normal.dot(c.cross(a)) >= 0) {
-        h.t = t;
-        h.point = p;
-        h.normal = normal;
-        h.material = material;
-        obj = this;
-        return true;
-      }
-    }
-    return false;
+    if (t <= tmin || h.t <= t) return false;
+    Vector3f p = r.pointAtParameter(t);
+    Vector3f a = vertices[0] - p, b = vertices[1] - p, c = vertices[2] - p;
+    if (normal.dot(a.cross(b)) < 0 || normal.dot(b.cross(c)) < 0 ||
+        normal.dot(c.cross(a)) < 0)
+      return false;
+    h.t = t;
+    h.point = p;
+    h.normal = normal;
+    h.material = material;
+    obj = this;
+    return true;
   }
 
   Vector3f normal;

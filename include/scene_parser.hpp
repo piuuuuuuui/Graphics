@@ -6,12 +6,14 @@
 #include "utils.hpp"
 
 class Camera;
+class Curve;
 class Disk;
 class Fractal;
 class Material;
 class MotionBlur;
 class Object3D;
 class Group;
+class RevSurface;
 class Sphere;
 class Plane;
 class Portal;
@@ -64,6 +66,8 @@ class SceneParser {
   Disk *parseDisk();
   Triangle *parseTriangle();
   Mesh *parseTriangleMesh();
+  Curve *parseBsplineCurve();
+  RevSurface *parseRevSurface();
   Transform *parseTransform();
   MotionBlur *parseMotionBlur();
   Fractal *parseFractal();

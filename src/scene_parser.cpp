@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "camera.hpp"
+#include "curve.hpp"
 #include "disk.hpp"
 #include "fractal.hpp"
 #include "group.hpp"
@@ -13,6 +14,7 @@
 #include "object3d.hpp"
 #include "plane.hpp"
 #include "portal.hpp"
+#include "revsurface.hpp"
 #include "sphere.hpp"
 #include "transform.hpp"
 #include "triangle.hpp"
@@ -221,7 +223,7 @@ void SceneParser::parseObjects() {
   objects = new Object3D *[num_objects];
   // read in the objects
   int count = 0;
-  while (num_objects > count) {
+  while (count < num_objects) {
     getToken(token);
     if (!strcmp(token, "MaterialIndex")) {
       // change the current material
@@ -251,6 +253,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
     answer = (Object3D *)parseTriangle();
   } else if (!strcmp(token, "TriangleMesh")) {
     answer = (Object3D *)parseTriangleMesh();
+  } else if (!strcmp(token, "RevSurface")) {
+    answer = (Object3D *)parseRevSurface();
   } else if (!strcmp(token, "Transform")) {
     answer = (Object3D *)parseTransform();
   } else if (!strcmp(token, "MotionBlur")) {
@@ -288,7 +292,7 @@ void SceneParser::parseMaterials() {
   materials = new Material *[num_materials];
   // read in the objects
   int count = 0;
-  while (num_materials > count) {
+  while (count < num_materials) {
     getToken(token);
     if (!strcmp(token, "Material") || !strcmp(token, "PhongMaterial")) {
       materials[count] = parseMaterial();
@@ -370,7 +374,7 @@ Group *SceneParser::parseGroup() {
 
   // read in the objects
   int count = 0;
-  while (num_group_objects > count) {
+  while (count < num_group_objects) {
     getToken(token);
     if (!strcmp(token, "MaterialIndex")) {
       // change the current material
@@ -482,6 +486,50 @@ Mesh *SceneParser::parseTriangleMesh() {
   return answer;
 }
 
+Curve *SceneParser::parseBsplineCurve() {
+  char token[MAX_PARSER_TOKEN_LENGTH];
+  getToken(token);
+  assert(!strcmp(token, "{"));
+  getToken(token);
+  assert(!strcmp(token, "controls"));
+  vector<Vector3f> controls;
+  while (true) {
+    getToken(token);
+    if (!strcmp(token, "[")) {
+      controls.push_back(readVector3f());
+      getToken(token);
+      assert(!strcmp(token, "]"));
+    } else if (!strcmp(token, "}")) {
+      break;
+    } else {
+      printf("Incorrect format for BsplineCurve\n");
+      exit(0);
+    }
+  }
+  Curve *answer = new BsplineCurve(controls);
+  return answer;
+}
+
+RevSurface *SceneParser::parseRevSurface() {
+  char token[MAX_PARSER_TOKEN_LENGTH];
+  getToken(token);
+  assert(!strcmp(token, "{"));
+  getToken(token);
+  assert(!strcmp(token, "profile"));
+  Curve *profile;
+  getToken(token);
+  if (!strcmp(token, "BsplineCurve")) {
+    profile = parseBsplineCurve();
+  } else {
+    printf("Unknown profile type in parseRevSurface: '%s'\n", token);
+    exit(0);
+  }
+  getToken(token);
+  assert(!strcmp(token, "}"));
+  auto *answer = new RevSurface(profile, current_material);
+  return answer;
+}
+
 Transform *SceneParser::parseTransform() {
   char token[MAX_PARSER_TOKEN_LENGTH];
   Affine3f tr(Affine3f::Identity());
@@ -532,7 +580,7 @@ Fractal *SceneParser::parseFractal() {
 
   // read in the transforms
   int count = 0;
-  while (num_transforms > count) {
+  while (count < num_transforms) {
     Affine3f tr(Affine3f::Identity());
     getToken(token);
     assert(!strcmp(token, "Transform"));

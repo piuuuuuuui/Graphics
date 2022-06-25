@@ -20,7 +20,7 @@ class Transform : public Object3D {
   virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
     Vector3f trSource = inv * r.origin;
     Vector3f trDirection = inv.linear() * r.direction;
-    if (trSource.squaredNorm() + trDirection.squaredNorm() > 1e6) return false;
+    if (1e6 < trSource.squaredNorm() + trDirection.squaredNorm()) return false;
     if (!o->intersect(Ray(trSource, trDirection), h, obj, tmin)) return false;
     h.point = tr * h.point;
     h.normal = (inv.linear().transpose() * h.normal).normalized();

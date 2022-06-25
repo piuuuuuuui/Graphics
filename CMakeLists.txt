@@ -18,6 +18,7 @@ SET(UE4_SOURCES
 
 SET(UE4_INCLUDES
         include/camera.hpp
+        include/curve.hpp
         include/disk.hpp
         include/fractal.hpp
         include/group.hpp
@@ -30,6 +31,7 @@ SET(UE4_INCLUDES
         include/portal.hpp
         include/ray.hpp
         include/render.hpp
+        include/revsurface.hpp
         include/scene_parser.hpp
         include/sphere.hpp
         include/transform.hpp

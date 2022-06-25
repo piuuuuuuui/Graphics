@@ -47,7 +47,7 @@ class PTRenderer {
     for (int depth = 0; depth < MAX_DEPTH; depth++) {
       Hit hit;
       Object3D* obj = nullptr;
-      if (!group->intersect(ray, hit, obj, 1e-5))
+      if (!group->intersect(ray, hit, obj, 1e-5f))
         return ray.colorTrans * scene.getBackgroundColor();
       if (!obj->getNextRay(hit, ray)) break;
     }

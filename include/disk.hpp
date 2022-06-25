@@ -14,18 +14,15 @@ class Disk : public Object3D {
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
     float cos = -n.dot(r.direction);
     float t = (n.dot(r.origin - o)) / cos;
-    if (t < h.t && t > tmin) {
-      Vector3f p = r.pointAtParameter(t);
-      if ((p - o).norm() <= radius) {
-        h.t = t;
-        h.point = p;
-        h.normal = n;
-        h.material = material;
-        obj = this;
-        return true;
-      }
-    }
-    return false;
+    if (t <= tmin || h.t <= t) return false;
+    Vector3f p = r.pointAtParameter(t);
+    if (radius <= (p - o).norm()) return false;
+    h.t = t;
+    h.point = p;
+    h.normal = n;
+    h.material = material;
+    obj = this;
+    return true;
   }
 
  protected:
