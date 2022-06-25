@@ -11,6 +11,7 @@
 #include "group.hpp"
 #include "material.hpp"
 #include "mesh.hpp"
+#include "motion_blur.hpp"
 #include "object3d.hpp"
 #include "plane.hpp"
 #include "portal.hpp"

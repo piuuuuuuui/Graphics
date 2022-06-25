@@ -20,23 +20,23 @@ class PTRenderer {
     int w = camera->getWidth(), h = camera->getHeight();
     Image image(w, h);
 
-    for (int i = 0; i < NUM_ITERS; i++) {
-      cout << "Iteration: " << i + 1 << ", time: ";
+    while (iter < NUM_ITERS) {
+      cout << "Iteration: " << iter + 1 << ", time: ";
       auto begin = high_resolution_clock::now();
 #pragma omp parallel for collapse(2) schedule(dynamic, 1) \
     num_threads(16)  // OpenMP
       for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
           Ray ray = camera->generateRay(Vector2f(x + RAND_U, y + RAND_U));
-          ray.frame = i;
           Vector3f& color = image.GetPixel(x, y);
-          color = (color * i + getColor(ray)) / (i + 1);
+          color = (color * iter + getColor(ray)) / (iter + 1);
         }
       }
       image.SaveImage("output/0.bmp");
       auto end = high_resolution_clock::now();
       float time_ms = duration_cast<nanoseconds>(end - begin).count() / 1e6;
       cout << time_ms << "ms" << endl;
+      iter++;
     }
     return image;
   }

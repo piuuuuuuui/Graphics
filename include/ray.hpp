@@ -15,8 +15,6 @@ class Ray {
   Vector3f origin;
   Vector3f direction;
 
-  int frame = 0;
-
   float refractiveIndex = 1.f;
   Matrix4f translucency = Matrix4f::Zero();
   Affine3f colorTrans = Affine3f::Identity();

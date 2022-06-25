@@ -22,6 +22,8 @@ const int MAX_DEPTH = 16;
 const float FPS = NUM_ITERS / 1.f;
 const int NEWTON_ITERS = 8;
 
+extern int iter;
+
 static random_device rd;
 static mt19937 gen(rd());
 static uniform_real_distribution<float> uniform(0.0, 1.0);
