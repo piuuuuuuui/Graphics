@@ -12,7 +12,8 @@ class Group : public Object3D {
   ~Group() override {}
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
-    if (!Object3D::intersect(r, h, obj, tmin)) return false;
+    float _tmin = tmin, _tmax = h.t;
+    if (!bbox.intersect(r, _tmin, _tmax)) return false;
     bool result = false;
     for (Object3D *object : objects)
       result |= object->intersect(r, h, obj, tmin);

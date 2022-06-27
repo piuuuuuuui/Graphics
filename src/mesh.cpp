@@ -1,97 +1,80 @@
 #include "mesh.hpp"
 
-#include <algorithm>
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <utility>
 
 bool Mesh::intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
-  // Optional: Change this brute force method into a faster one.
+  float _tmin = tmin, _tmax = h.t;
+  if (!bbox.intersect(r, _tmin, _tmax)) return false;
   bool result = false;
-  for (int triId = 0; triId < (int)t.size(); ++triId) {
-    TriangleIndex &triIndex = t[triId];
-    Triangle triangle(v[triIndex[0]], v[triIndex[1]], v[triIndex[2]], material);
-    triangle.normal = n[triId];
-    result |= triangle.intersect(r, h, obj, tmin);
-  }
+  for (Triangle *trig : triangles) result |= trig->intersect(r, h, obj, tmin);
   if (!result) return false;
   obj = this;
   return true;
 }
 
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
-  // Optional: Use tiny obj loader to replace this simple one.
-  ifstream f;
-  f.open(filename);
-  if (!f.is_open()) {
+  vector<Vector3f> v, vn;
+  vector<Vector2f> vt;
+  vector<array<TriangleIndex, 3>> f;
+
+  // read obj file
+  const string vTok("v"), vtTok("vt"), vnTok("vn"), fTok("f");
+  ifstream fs;
+  fs.open(filename);
+  if (!fs.is_open()) {
     cout << "Cannot open " << filename << "\n";
     return;
   }
-  string line;
-  string vTok("v");
-  string fTok("f");
-  string texTok("vt");
-  char bslash = '/', space = ' ';
-  string tok;
+  string line, tok;
   int texID;
   while (true) {
-    getline(f, line);
-    if (f.eof()) {
-      break;
-    }
-    if (line.size() < 3) {
-      continue;
-    }
-    if (line.at(0) == '#') {
-      continue;
-    }
+    getline(fs, line);
+    if (fs.eof()) break;
+    if (line.size() < 3) continue;
+    if (line.at(0) == '#') continue;
     stringstream ss(line);
     ss >> tok;
     if (tok == vTok) {
       Vector3f vec;
       ss >> vec[0] >> vec[1] >> vec[2];
       v.push_back(vec);
-      bbox.min() = bbox.min().cwiseMin(vec);
-      bbox.max() = bbox.max().cwiseMax(vec);
-    } else if (tok == fTok) {
-      if (line.find(bslash) != string::npos) {
-        replace(line.begin(), line.end(), bslash, space);
-        stringstream facess(line);
-        TriangleIndex trig;
-        facess >> tok;
-        for (int ii = 0; ii < 3; ii++) {
-          facess >> trig[ii] >> texID;
-          trig[ii]--;
-        }
-        t.push_back(trig);
-      } else {
-        TriangleIndex trig;
-        for (int ii = 0; ii < 3; ii++) {
-          ss >> trig[ii];
-          trig[ii]--;
-        }
-        t.push_back(trig);
-      }
-    } else if (tok == texTok) {
+      bbox.extend(vec);
+    } else if (tok == vtTok) {
       Vector2f texcoord;
       ss >> texcoord[0];
       ss >> texcoord[1];
+      vt.push_back(texcoord);
+    } else if (tok == vnTok) {
+      Vector3f vec;
+      ss >> vec[0] >> vec[1] >> vec[2];
+      vn.push_back(vec);
+    } else if (tok == fTok) {
+      array<TriangleIndex, 3> vtn;
+      for (int i = 0; i < 3; ++i) {
+        string raw, parsed;
+        ss >> raw;
+        stringstream vtns(raw);
+        for (TriangleIndex &idx : vtn) {
+          idx[i] = -1;
+          if (!vtns.eof()) {
+            getline(vtns, parsed, '/');
+            idx[i] += atoi(parsed.c_str());
+          }
+        }
+      }
+      f.push_back(vtn);
     }
   }
-  computeNormal();
+  fs.close();
 
-  f.close();
-}
-
-void Mesh::computeNormal() {
-  n.resize(t.size());
-  for (int triId = 0; triId < (int)t.size(); ++triId) {
-    TriangleIndex &triIndex = t[triId];
-    Vector3f a = v[triIndex[1]] - v[triIndex[0]];
-    Vector3f b = v[triIndex[2]] - v[triIndex[0]];
-    b = a.cross(b);
-    n[triId] = b / b.norm();
+  // construct triangles
+  for (const auto &vtn : f) {
+    auto v_idx = vtn[0], t_idx = vtn[1], n_idx = vtn[2];
+    auto trig = new Triangle(v[v_idx[0]], v[v_idx[1]], v[v_idx[2]], material);
+    if (t_idx.valid()) trig->setVt(vt[t_idx[0]], vt[t_idx[1]], vt[t_idx[2]]);
+    if (n_idx.valid()) trig->setVn(vn[n_idx[0]], vn[n_idx[1]], vn[n_idx[2]]);
+    triangles.push_back(trig);
   }
 }

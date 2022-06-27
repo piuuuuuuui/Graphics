@@ -6,6 +6,34 @@
 #include "ray.hpp"
 #include "utils.hpp"
 
+class AABB : public Eigen::AlignedBox3f {
+ public:
+  AABB() = default;
+
+  AABB(const Eigen::AlignedBox3f &bbox) : Eigen::AlignedBox3f(bbox) {}
+
+  ~AABB() = default;
+
+  /** \returns true if r intersects with *this within (tmin, tmax).
+   * Also updates tmin and tmax. */
+  inline bool intersect(const Ray &r, float &tmin, float &tmax) {
+    for (int i = 0; i < 3; i++) {
+      float dir_i = r.direction[i], t1, t2;
+      if (0 <= dir_i) {
+        t1 = (min()[i] - r.origin[i]) / dir_i;
+        t2 = (max()[i] - r.origin[i]) / dir_i;
+      } else {
+        t1 = (max()[i] - r.origin[i]) / dir_i;
+        t2 = (min()[i] - r.origin[i]) / dir_i;
+      }
+      tmin = std::max(tmin, t1);
+      tmax = std::min(tmax, t2);
+      if (!(tmin < tmax)) return false;
+    }
+    return true;
+  }
+};
+
 // Base class for all 3d entities.
 class Object3D {
  public:
@@ -16,19 +44,7 @@ class Object3D {
   explicit Object3D(Material *material) { this->material = material; }
 
   // Intersect Ray with this object. If hit, store information in hit structure.
-  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
-    // check if intersect with bbox
-    // should not change h and obj
-    float tmax = h.t;
-    for (int i = 0; i < 3; i++) {
-      float t1 = (bbox.min()[i] - r.origin[i]) / r.direction[i],
-            t2 = (bbox.max()[i] - r.origin[i]) / r.direction[i];
-      tmin = max(tmin, min(t1, t2));
-      tmax = min(tmax, max(t1, t2));
-      if (tmax <= tmin) return false;
-    }
-    return true;
-  }
+  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) = 0;
 
   virtual bool getNextRay(const Hit &hit, Ray &ray) {
     Vector3f &dir = ray.direction;
@@ -87,13 +103,13 @@ class Object3D {
     return true;
   }
 
-  const Eigen::AlignedBox3f &getBBox() const { return bbox; }
+  const AABB &getBBox() const { return bbox; }
 
  protected:
   virtual Vector3f getNormal(const Vector3f &n, float, float) { return n; }
 
   Material *material;
-  Eigen::AlignedBox3f bbox;
+  AABB bbox;
 };
 
 #endif

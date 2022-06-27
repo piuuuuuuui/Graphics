@@ -15,19 +15,21 @@ class Mesh : public Object3D {
       x[1] = 0;
       x[2] = 0;
     }
-    int &operator[](const int i) { return x[i]; }
+
+    int &operator[](int i) { return x[i]; }
+
+    const int operator[](int i) const { return x[i]; }
+
+    bool valid() { return 0 <= x[0] && 0 <= x[1] && 0 <= x[2]; }
+
     // By Computer Graphics convention, counterclockwise winding is front face
-    int x[3]{};
+    int x[3];
   };
 
-  vector<Vector3f> v;
-  vector<TriangleIndex> t;
-  vector<Vector3f> n;
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override;
 
- private:
-  // Normal can be used for light estimation
-  void computeNormal();
+ protected:
+  vector<Triangle *> triangles;
 };
 
 #endif
