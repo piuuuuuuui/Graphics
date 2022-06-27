@@ -9,28 +9,23 @@ class Triangle : public Object3D {
 
   // a b c are three vertex positions of the triangle
   Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c, Material *m)
-      : Object3D(m) {
-    vertices[0] = a;
-    vertices[1] = b;
-    vertices[2] = c;
-    // counterclockwise orientation
+      : Object3D(m), o(a) {
+    tr << b - a, c - a;
     normal = (b - a).cross(c - a).normalized();
-    d = normal.dot(a);
     bbox.min() = a.cwiseMin(b.cwiseMin(c));
     bbox.max() = a.cwiseMax(b.cwiseMax(c));
   }
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
-    float cos = -normal.dot(r.direction);
-    float t = (normal.dot(r.origin) - d) / cos;
-    if (t <= tmin || h.t <= t) return false;
-    Vector3f p = r.pointAtParameter(t);
-    Vector3f a = vertices[0] - p, b = vertices[1] - p, c = vertices[2] - p;
-    if (normal.dot(a.cross(b)) < 0 || normal.dot(b.cross(c)) < 0 ||
-        normal.dot(c.cross(a)) < 0)
+    tr.col(2) = -r.direction;
+    Vector3f origin = tr.inverse() * (r.origin - o);
+    float u = origin.x(), v = origin.y(), t = origin.z();
+    if (!(tmin < t && t < h.t && 0.f < u && 0.f < v && u + v < 1.f))
       return false;
     h.t = t;
-    h.point = p;
+    h.u = u;
+    h.v = v;
+    h.point = r.pointAtParameter(t);
     h.normal = normal;
     h.material = material;
     obj = this;
@@ -38,10 +33,10 @@ class Triangle : public Object3D {
   }
 
   Vector3f normal;
-  Vector3f vertices[3];
 
  protected:
-  float d;
+  Vector3f o;
+  Eigen::Matrix3f tr;
 };
 
 #endif  // TRIANGLE_H

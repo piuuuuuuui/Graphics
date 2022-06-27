@@ -22,7 +22,7 @@ class RevSurface : public Object3D {
     float kk = dir.squaredNorm();
     float t = orig.dot(dir) / kk;
     float dd = (dir * t - orig).squaredNorm();
-    if (rr <= dd) return false;
+    if (!(dd < rr)) return false;
     tmin = max(tmin, t - sqrt((rr - dd) / kk));
 
     // Newton's method

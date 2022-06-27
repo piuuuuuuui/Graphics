@@ -24,12 +24,12 @@ class Sphere : public Object3D {
     float kk = dir.squaredNorm();
     float t0 = vec.dot(dir) / kk;
     float dd = (dir * t0 - vec).squaredNorm();
-    if (rr <= dd) return false;
+    if (!(dd < rr)) return false;
     float t = t0 - sqrt((rr - dd) / kk);  // first intersection
-    if (h.t <= t) return false;
-    if (t <= tmin) {
+    if (!(t < h.t)) return false;
+    if (!(tmin < t)) {
       t = t0 * 2 - t;  // second intersection
-      if (t <= tmin || h.t <= t) return false;
+      if (!(tmin < t && t < h.t)) return false;
     }
     Vector3f p = r.pointAtParameter(t), n = (p - center) / radius;
     h.t = t;

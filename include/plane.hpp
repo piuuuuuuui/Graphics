@@ -20,7 +20,7 @@ class Plane : public Object3D {
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
     float cos = -n.dot(r.direction);
     float t = (n.dot(r.origin) - d) / cos;
-    if (t <= tmin || h.t <= t) return false;
+    if (!(tmin < t && t < h.t)) return false;
     h.t = t;
     h.point = r.pointAtParameter(t);
     h.normal = n;
