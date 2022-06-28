@@ -42,7 +42,7 @@ void Image::SaveTGA(const char *filename) const {
   assert(!strcmp(ext, ".tga"));
   FILE *file = fopen(filename, "wb");
   // misc header information
-  for (int i = 0; i < 18; i++) {
+  for (int i = 0; i < 18; ++i) {
     if (i == 2)
       WriteByte(file, 2);
     else if (i == 12)
@@ -63,7 +63,7 @@ void Image::SaveTGA(const char *filename) const {
   // the data
   // flip y so that (0,0) is bottom left corner
   for (int y = height - 1; y >= 0; y--) {
-    for (int x = 0; x < width; x++) {
+    for (int x = 0; x < width; ++x) {
       Vector3f v = GetPixel(x, y);
       // note reversed order: b, g, r
       WriteByte(file, ClampColorComponent(v[2]));
@@ -83,7 +83,7 @@ Image *Image::LoadTGA(const char *filename) {
   // misc header information
   int width = 0;
   int height = 0;
-  for (int i = 0; i < 18; i++) {
+  for (int i = 0; i < 18; ++i) {
     unsigned char tmp;
     tmp = ReadByte(file);
     if (i == 2)
@@ -107,7 +107,7 @@ Image *Image::LoadTGA(const char *filename) {
   Image *answer = new Image(width, height);
   // flip y so that (0,0) is bottom left corner
   for (int y = height - 1; y >= 0; y--) {
-    for (int x = 0; x < width; x++) {
+    for (int x = 0; x < width; ++x) {
       unsigned char r, g, b;
       // note reversed order: b, g, r
       b = ReadByte(file);
@@ -139,7 +139,7 @@ void Image::SavePPM(const char *filename) const {
   // the data
   // flip y so that (0,0) is bottom left corner
   for (int y = height - 1; y >= 0; y--) {
-    for (int x = 0; x < width; x++) {
+    for (int x = 0; x < width; ++x) {
       Vector3f v = GetPixel(x, y);
       fputc(ClampColorComponent(v[0]), file);
       fputc(ClampColorComponent(v[1]), file);
@@ -171,7 +171,7 @@ Image *Image::LoadPPM(const char *filename) {
   Image *answer = new Image(width, height);
   // flip y so that (0,0) is bottom left corner
   for (int y = height - 1; y >= 0; y--) {
-    for (int x = 0; x < width; x++) {
+    for (int x = 0; x < width; ++x) {
       unsigned char r, g, b;
       r = fgetc(file);
       g = fgetc(file);
@@ -275,8 +275,8 @@ int Image::SaveBMP(const char *filename) {
     return (0);
   }
 
-  for (i = 0; i < height; i++) {
-    for (j = 0; j < width; j++) {
+  for (i = 0; i < height; ++i) {
+    for (j = 0; j < width; ++j) {
       ipos = (width * i + j);
       line[3 * j] = ClampColorComponent(rgb[ipos][2]);
       line[3 * j + 1] = ClampColorComponent(rgb[ipos][1]);

@@ -27,7 +27,7 @@ class RevSurface : public Object3D {
 
     // Newton's method
     bool result = false;
-    for (int i = 0; i < newton_times; i++)
+    for (int i = 0; i < newton_times; ++i)
       if (newton(r, h, obj, tmin)) result = true;
     return result;
   }
@@ -39,7 +39,7 @@ class RevSurface : public Object3D {
     // solve f(t,u,v) := p(t)-p(u,v) = 0
     Eigen::Matrix3f jacobian;       // jacobian of f
     jacobian.col(0) = r.direction;  // df/dt
-    for (int i = 0; i < NEWTON_ITERS; i++) {
+    for (int i = 0; i < NEWTON_ITERS; ++i) {
       Vector3f p, tp;  // point and tangent
       compute(x[1], x[2], p, tp);
       Vector3f f = r.pointAtParameter(x[0]) - p;

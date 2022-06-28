@@ -57,7 +57,7 @@ SceneParser::~SceneParser() {
   delete camera;
 
   int i;
-  for (i = 0; i < num_materials; i++) {
+  for (i = 0; i < num_materials; ++i) {
     delete materials[i];
   }
   delete[] materials;
@@ -233,7 +233,7 @@ void SceneParser::parseObjects() {
       current_material = getMaterial(index);
     } else {
       objects[count] = parseObject(token);
-      count++;
+      ++count;
     }
   }
   getToken(token);
@@ -301,7 +301,7 @@ void SceneParser::parseMaterials() {
       printf("Unknown token in parseMaterial: '%s'\n", token);
       exit(0);
     }
-    count++;
+    ++count;
   }
   getToken(token);
   assert(!strcmp(token, "}"));
@@ -386,7 +386,7 @@ Group *SceneParser::parseGroup() {
       Object3D *object = parseObject(token);
       assert(object != nullptr);
       answer->addObject(object);
-      count++;
+      ++count;
     }
   }
   getToken(token);
@@ -591,7 +591,7 @@ Fractal *SceneParser::parseFractal() {
     while (parseMatrix4f(token, tr)) getToken(token);
     assert(!strcmp(token, "}"));
     trs.push_back(tr);
-    count++;
+    ++count;
   }
 
   // read in the object
@@ -670,8 +670,8 @@ bool SceneParser::parseMatrix4f(char token[MAX_PARSER_TOKEN_LENGTH],
     Matrix4f m;
     getToken(token);
     assert(!strcmp(token, "{"));
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < 4; j++) {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         m(i, j) = readFloat();
       }
     }

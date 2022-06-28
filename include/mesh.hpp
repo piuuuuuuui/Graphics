@@ -3,11 +3,14 @@
 
 #include <vector>
 
+#include "group.hpp"
 #include "triangle.hpp"
 
-class Mesh : public Object3D {
+class Mesh : public Group {
  public:
   Mesh(const char *filename, Material *m);
+
+  Mesh(vector<Triangle *>::iterator begin, vector<Triangle *>::iterator end);
 
   struct TriangleIndex {
     TriangleIndex() {
@@ -27,9 +30,6 @@ class Mesh : public Object3D {
   };
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override;
-
- protected:
-  vector<Triangle *> triangles;
 };
 
 #endif

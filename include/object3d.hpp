@@ -17,7 +17,7 @@ class AABB : public Eigen::AlignedBox3f {
   /** \returns true if r intersects with *this within (tmin, tmax).
    * Also updates tmin and tmax. */
   inline bool intersect(const Ray &r, float &tmin, float &tmax) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; ++i) {
       float dir_i = r.direction[i], t1, t2;
       if (0 <= dir_i) {
         t1 = (min()[i] - r.origin[i]) / dir_i;

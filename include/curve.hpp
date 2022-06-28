@@ -37,8 +37,8 @@ class BsplineCurve : public Curve {
       exit(0);
     }
     MatrixXf m_points(3, n + 3);
-    for (int i = 0; i < n + 3; i++) m_points.col(i) = controls.at(i);
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n + 3; ++i) m_points.col(i) = controls.at(i);
+    for (int i = 0; i < n; ++i) {
       auto poly = m_points(Eigen::indexing::all, Eigen::seqN(i, 4)) * m_b;
       poly_b.push_back(poly);
       poly_db.push_back(poly * m_d);
@@ -49,7 +49,7 @@ class BsplineCurve : public Curve {
     float i;
     t = modf(t * poly_b.size(), &i);
     Eigen::Vector4f t_pows = Eigen::Vector4f::UnitX();
-    for (int j = 1; j < 4; j++) t_pows[j] = t_pows[j - 1] * t;
+    for (int j = 1; j < 4; ++j) t_pows[j] = t_pows[j - 1] * t;
     p = poly_b[i] * t_pows;
     tp = poly_db[i] * t_pows.head<3>() * poly_b.size();
   }

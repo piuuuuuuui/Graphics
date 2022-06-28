@@ -14,7 +14,7 @@ class MotionBlur : public Transform {
     Eigen::MatrixPower<Matrix4f> tr_pow(tr.matrix()), inv_pow(inv.matrix());
     tr_pows.resize(NUM_ITERS);
     inv_pows.resize(NUM_ITERS);
-    for (int i = 0; i < NUM_ITERS; i++) {
+    for (int i = 0; i < NUM_ITERS; ++i) {
       tr_pows[i].matrix() = tr_pow(i / FPS);
       inv_pows[i].matrix() = inv_pow(i / FPS);
       bbox.extend(o->getBBox().transformed(tr_pows[i]));

@@ -4,20 +4,11 @@
 #include <iostream>
 #include <sstream>
 
-bool Mesh::intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
-  float _tmin = tmin, _tmax = h.t;
-  if (!bbox.intersect(r, _tmin, _tmax)) return false;
-  bool result = false;
-  for (Triangle *trig : triangles) result |= trig->intersect(r, h, obj, tmin);
-  if (!result) return false;
-  obj = this;
-  return true;
-}
-
-Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
+Mesh::Mesh(const char *filename, Material *material) {
   vector<Vector3f> v, vn;
   vector<Vector2f> vt;
   vector<array<TriangleIndex, 3>> f;
+  vector<Triangle *> triangles;
 
   // read obj file
   const string vTok("v"), vtTok("vt"), vnTok("vn"), fTok("f");
@@ -40,7 +31,6 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
       Vector3f vec;
       ss >> vec[0] >> vec[1] >> vec[2];
       v.push_back(vec);
-      bbox.extend(vec);
     } else if (tok == vtTok) {
       Vector2f texcoord;
       ss >> texcoord[0];
@@ -77,4 +67,27 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     if (n_idx.valid()) trig->setVn(vn[n_idx[0]], vn[n_idx[1]], vn[n_idx[2]]);
     triangles.push_back(trig);
   }
+
+  // build kd tree
+  *this = Mesh(triangles.begin(), triangles.end());
+}
+
+Mesh::Mesh(vector<Triangle *>::iterator begin,
+           vector<Triangle *>::iterator end) {
+  size_t n = end - begin;
+  if (n < 4) {
+    for (auto it = begin; it < end; ++it) addObject(*it);
+    return;
+  }
+  int axis = -1;
+  bbox.sizes().maxCoeff(&axis);
+  sort(begin, end, [&](Triangle *a, Triangle *b) {
+    return a->getBBox().center()[axis] < b->getBBox().center()[axis];
+  });
+  addObject(new Mesh(begin + n / 2, end));
+  addObject(new Mesh(begin, begin + n / 2));
+}
+
+bool Mesh::intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
+  return Group::intersect(r, h, obj, tmin);
 }

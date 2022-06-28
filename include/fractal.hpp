@@ -17,14 +17,14 @@ class Fractal : public Group {
       objects.push_back(new Transform(tr, this));
       vector<Eigen::Vector4f> cols;
       Eigen::EigenSolver<Matrix4f> es(tr.matrix());
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < 4; ++i) {
         if (abs(es.eigenvalues()[i] - 1.f) < 1e-5f) {
           auto col = es.eigenvectors().col(i).real();
           cols.push_back(col);
         }
       }
       Eigen::MatrixXf A(4, cols.size());
-      for (int i = 0; i < cols.size(); i++) A.col(i) = cols.at(i);
+      for (int i = 0; i < cols.size(); ++i) A.col(i) = cols.at(i);
       Eigen::VectorXf x =
           A.colPivHouseholderQr().solve(bbox.center().homogeneous());
       Vector3f fixed = (A * x).hnormalized();
