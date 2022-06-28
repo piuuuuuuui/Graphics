@@ -1,8 +1,6 @@
 #ifndef FRACTAL_H
 #define FRACTAL_H
 
-#include <vector>
-
 #include "group.hpp"
 #include "transform.hpp"
 

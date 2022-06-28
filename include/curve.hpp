@@ -1,8 +1,6 @@
 #ifndef CURVE_H
 #define CURVE_H
 
-#include <vector>
-
 #include "object3d.hpp"
 
 using Eigen::MatrixXd;

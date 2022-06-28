@@ -1,8 +1,6 @@
 #ifndef MOTION_BLUR_H
 #define MOTION_BLUR_H
 
-#include <vector>
-
 #include "transform.hpp"
 
 class MotionBlur : public Transform {

@@ -16,7 +16,7 @@ class AABB : public Eigen::AlignedBox3d {
 
   /** \returns true if r intersects with *this within (tmin, tmax).
    * Also updates tmin and tmax. */
-  inline bool intersect(const Ray &r, double &tmin, double &tmax) {
+  inline bool intersect(const Ray &r, double &tmin, double &tmax) const {
     for (int i = 0; i < 3; ++i) {
       double dir_i = r.direction[i], t1, t2;
       if (0 <= dir_i) {
