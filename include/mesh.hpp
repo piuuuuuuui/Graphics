@@ -1,14 +1,14 @@
 #ifndef MESH_H
 #define MESH_H
 
-
+#include <map>
 
 #include "group.hpp"
 #include "triangle.hpp"
 
 class Mesh : public Group {
  public:
-  Mesh(const char *filename, Material *m);
+  Mesh(const string &filename, Material *m);
 
   Mesh(vector<Triangle *>::iterator begin, vector<Triangle *>::iterator end);
 
@@ -30,6 +30,9 @@ class Mesh : public Group {
   };
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override;
+
+ protected:
+  map<string, Material *> parseMtl(const string &dir, const string &filename);
 };
 
 #endif

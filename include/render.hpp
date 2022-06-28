@@ -23,8 +23,7 @@ class PTRenderer {
     while (iter < NUM_ITERS) {
       cout << "Iteration: " << iter + 1 << ", time: ";
       auto begin = high_resolution_clock::now();
-#pragma omp parallel for collapse(2) schedule(dynamic, 1) \
-    num_threads(16)  // OpenMP
+#pragma omp parallel for collapse(2) schedule(dynamic, 1)  // OpenMP
       for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
           Ray ray = camera->generateRay(Vector2d(x + RAND_U, y + RAND_U));

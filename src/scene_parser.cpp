@@ -325,8 +325,10 @@ Material *SceneParser::parseMaterial() {
       answer->roughness = readDouble();
     } else if (strcmp(token, "specularColor") == 0) {
       answer->specularColor = readVector3d();
+    } else if (strcmp(token, "opacity") == 0) {
+      answer->opacity = readDouble();
     } else if (strcmp(token, "transparency") == 0) {
-      answer->transparency = readDouble();
+      answer->opacity = 1 - readDouble();
     } else if (strcmp(token, "refractiveIndex") == 0) {
       answer->refractiveIndex = readDouble();
     } else if (strcmp(token, "refractiveColor") == 0) {

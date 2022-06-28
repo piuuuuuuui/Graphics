@@ -1,7 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "utils.hpp"
+#include "texture.hpp"
 
 class Material {
  public:
@@ -9,10 +9,15 @@ class Material {
   Vector3d diffuseColor = Vector3d::Ones();
   double roughness = 1.;
   Vector3d specularColor = Vector3d::Ones();
-  double transparency = 0.;
+  double opacity = 1.;
   double refractiveIndex = 1.;
   Vector3d refractiveColor = Vector3d::Ones();
   Matrix4d translucency = Matrix4d::Zero();
+  Texture *emissiveMap = nullptr;
+  Texture *diffuseMap = nullptr;
+  Texture *specularMap = nullptr;
+  Texture *opacityMap = nullptr;
+  Texture *bumpMap = nullptr;
 };
 
 #endif  // MATERIAL_H

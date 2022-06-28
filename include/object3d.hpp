@@ -68,26 +68,27 @@ class Object3D {
 
     ray.origin = hit.point;
 
-    // update color
+    // transmission
     tr *= (ray.translucency * hit.t).exp();
+    if (material.opacity < RAND_U) return true;
+
+    // emission
     tr.translate(material.emissiveColor);
 
     // Lambertian diffuse reflection
-    tr.scale(Vector3d::Constant(1. - roughness) +
-             material.diffuseColor * roughness);
+    tr.scale(Vector3d::Constant(1. - roughness) + material.diffuseColor);
     if ((tr.linear() * Vector3d::Ones()).maxCoeff() < 1e-2) return false;
-    dir = dir * (1. - roughness) +
-          (RAND_VEC - normal).normalized() * roughness;  // TODO: fix
+    dir = dir * (1. - roughness) + (RAND_VEC - normal).normalized() * roughness;
 
-    // reflection & refraction
-    if (RAND_U < material.transparency && 0 < n) {
+    // reflection or refraction
+    if (0 < n) {
       Vector3d sinI = dir.cross(normal), sinT = normal.cross(sinI) / n;
       double squaredCosT = 1 - sinT.squaredNorm();
       if (0 < squaredCosT) {
         double cosT = sqrt(squaredCosT),
                RS = pow((n * cosI - cosT) / (n * cosI + cosT), 2),
                RP = pow((n * cosT - cosI) / (n * cosT + cosI), 2),
-               R = (RS + RP) / 2;  // Fresnel reflectivity
+               R = (RS + RP) / 2;  // Fresnel
         if (R < RAND_U) {
           // refraction
           tr.scale(material.refractiveColor);
@@ -117,7 +118,16 @@ class Object3D {
 
   virtual Material getMaterial(const Material *material, double u, double v) {
     Material m = *material;
-    // TODO
+    if (nullptr != m.emissiveMap)
+      m.emissiveColor =
+          m.emissiveColor.cwiseProduct(m.emissiveMap->get(u, v).head<3>());
+    if (nullptr != m.diffuseMap)
+      m.diffuseColor =
+          m.diffuseColor.cwiseProduct(m.diffuseMap->get(u, v).head<3>());
+    if (nullptr != m.specularMap)
+      m.specularColor =
+          m.specularColor.cwiseProduct(m.specularMap->get(u, v).head<3>());
+    if (nullptr != m.opacityMap) m.opacity *= m.opacityMap->get(u, v)[0];
     return m;
   }
 

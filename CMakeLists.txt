@@ -14,6 +14,7 @@ SET(UE4_SOURCES
         src/main.cpp
         src/mesh.cpp
         src/scene_parser.cpp
+        src/texture.cpp
 )
 
 SET(UE4_INCLUDES
@@ -35,6 +36,8 @@ SET(UE4_INCLUDES
         include/revsurface.hpp
         include/scene_parser.hpp
         include/sphere.hpp
+        include/stb_image.h
+        include/texture.hpp
         include/transform.hpp
         include/triangle.hpp
         include/utils.hpp
