@@ -18,7 +18,7 @@ class Transform : public Object3D {
   virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) {
     Vector3d trSource = inv * r.origin;
     Vector3d trDirection = inv.linear() * r.direction;
-    if (1. / DBL_EPSILON < trSource.squaredNorm() + trDirection.squaredNorm())
+    if (DBL_LARGE < trSource.squaredNorm() + trDirection.squaredNorm())
       return false;
     if (!o->intersect(Ray(trSource, trDirection), h, obj, tmin)) return false;
     h.point = tr * h.point;

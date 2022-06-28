@@ -34,7 +34,7 @@ class RevSurface : public Object3D {
 
   bool newton(const Ray &r, Hit &h, Object3D *&obj, double tmin) {
     // init x := (t,u,v)
-    Vector3d x(tmin, RAND_U, RAND_U * (1. - 1e-6));
+    Vector3d x(tmin, RAND_U, RAND_U * (1. - DBL_EPSILON));
 
     // solve f(t,u,v) := p(t)-p(u,v) = 0
     Eigen::Matrix3d jacobian;       // jacobian of f
@@ -43,7 +43,7 @@ class RevSurface : public Object3D {
       Vector3d p, tp;  // point and tangent
       compute(x[1], x[2], p, tp);
       Vector3d f = r.pointAtParameter(x[0]) - p;
-      if (f.squaredNorm() < 1e-12) {
+      if (f.squaredNorm() < DBL_EPSILON) {
         h.t = x[0];
         h.u = x[1];
         h.v = x[2];
@@ -62,7 +62,7 @@ class RevSurface : public Object3D {
       // boundary check
       x[0] = max(min(x[0], h.t), tmin);
       x[1] -= floor(x[1]);
-      x[2] = max(min(x[2], 1. - 1e-6), 0.);
+      x[2] = max(min(x[2], 1. - DBL_EPSILON), 0.);
     }
     return false;
   }

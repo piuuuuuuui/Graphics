@@ -34,7 +34,7 @@ class PTRenderer {
       }
       image.SaveImage("output/0.bmp");
       auto end = high_resolution_clock::now();
-      double time_ms = duration_cast<nanoseconds>(end - begin).count() / 1e6;
+      double time_ms = duration_cast<milliseconds>(end - begin).count();
       cout << time_ms << "ms" << endl;
       ++iter;
     }

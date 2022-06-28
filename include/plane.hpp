@@ -11,8 +11,8 @@ class Plane : public Object3D {
     double norm = normal.norm();
     this->n = normal / norm;
     this->d = d / norm;
-    bbox.min() = Vector3d::Constant(-1e18);
-    bbox.max() = Vector3d::Constant(1e18);
+    bbox.min() = Vector3d::Constant(-DBL_LARGE);
+    bbox.max() = Vector3d::Constant(DBL_LARGE);
   }
 
   ~Plane() override = default;

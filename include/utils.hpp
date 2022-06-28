@@ -9,6 +9,7 @@
 #include <random>
 #include <unsupported/Eigen/MatrixFunctions>
 
+#define DBL_LARGE (1. / DBL_EPSILON)
 #define RAND_U uniform(gen)
 #define RAND_N gauss(gen)
 #define RAND_VEC Vector3d(gauss(gen), gauss(gen), gauss(gen)).normalized()
