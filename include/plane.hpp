@@ -7,31 +7,31 @@ class Plane : public Object3D {
  public:
   Plane() = delete;
 
-  Plane(const Vector3f &normal, float d, Material *m) : Object3D(m) {
-    float norm = normal.norm();
+  Plane(const Vector3d &normal, double d, Material *m) : Object3D(m) {
+    double norm = normal.norm();
     this->n = normal / norm;
     this->d = d / norm;
-    bbox.min() = Vector3f::Constant(-1e18);
-    bbox.max() = Vector3f::Constant(1e18);
+    bbox.min() = Vector3d::Constant(-1e18);
+    bbox.max() = Vector3d::Constant(1e18);
   }
 
   ~Plane() override = default;
 
-  bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
-    float cos = -n.dot(r.direction);
-    float t = (n.dot(r.origin) - d) / cos;
+  bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override {
+    double cos = -n.dot(r.direction);
+    double t = (n.dot(r.origin) - d) / cos;
     if (!(tmin < t && t < h.t)) return false;
     h.t = t;
     h.point = r.pointAtParameter(t);
     h.normal = n;
-    h.material = material;
+    h.material = mtl;
     obj = this;
     return true;
   }
 
  protected:
-  Vector3f n;
-  float d;
+  Vector3d n;
+  double d;
 };
 
 #endif  // PLANE_H

@@ -7,27 +7,27 @@ class Disk : public Object3D {
  public:
   Disk() = delete;
 
-  Disk(const Vector3f &center, const Vector3f &normal, float radius,
+  Disk(const Vector3d &center, const Vector3d &normal, double radius,
        Material *m)
       : Object3D(m), o(center), n(normal), radius(radius) {}
 
-  bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
-    float cos = -n.dot(r.direction);
-    float t = (n.dot(r.origin - o)) / cos;
+  bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override {
+    double cos = -n.dot(r.direction);
+    double t = (n.dot(r.origin - o)) / cos;
     if (!(tmin < t && t < h.t)) return false;
-    Vector3f p = r.pointAtParameter(t);
+    Vector3d p = r.pointAtParameter(t);
     if (!((p - o).norm() < radius)) return false;
     h.t = t;
     h.point = p;
     h.normal = n;
-    h.material = material;
+    h.material = mtl;
     obj = this;
     return true;
   }
 
  protected:
-  Vector3f o, n;
-  float radius;
+  Vector3d o, n;
+  double radius;
 };
 
 #endif  // DISK_H

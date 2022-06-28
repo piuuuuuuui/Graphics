@@ -8,47 +8,46 @@ class Triangle : public Object3D {
   Triangle() = delete;
 
   // a b c are three vertex positions of the triangle
-  Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c, Material *m)
+  Triangle(const Vector3d &a, const Vector3d &b, const Vector3d &c, Material *m)
       : Object3D(m), o(a) {
-    Vector3f normal = (b - a).cross(c - a).normalized();
+    Vector3d normal = (b - a).cross(c - a).normalized();
     tr << b - a, c - a, normal;
-    n.setZero();
-    n.col(2) = normal;
-    t.setIdentity();
+    vn.setZero();
+    vn.col(2) = normal;
+    vt.setIdentity();
     bbox.extend(a);
     bbox.extend(b);
     bbox.extend(c);
   }
 
-  bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
+  bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override {
     tr.col(2) = -r.direction;
-    Vector3f origin = tr.inverse() * (r.origin - o);
-    float u = origin.x(), v = origin.y(), t = origin.z();
-    if (!(tmin < t && t < h.t && 0.f < u && 0.f < v && u + v < 1.f))
-      return false;
+    Vector3d origin = tr.inverse() * (r.origin - o);
+    double u = origin.x(), v = origin.y(), t = origin.z();
+    if (!(tmin < t && t < h.t && 0. < u && 0. < v && u + v < 1.)) return false;
     h.t = t;
-    Vector2f uv = t * Vector2f(u, v);
+    Vector2d uv = vt * Vector2d(u, v);
     h.u = uv[0];
     h.v = uv[1];
     h.point = r.pointAtParameter(t);
-    h.normal = n * Vector3f(u, v, 1);
-    h.material = material;
+    h.normal = vn * Vector3d(u, v, 1);
+    h.material = mtl;
     obj = this;
     return true;
   }
 
-  void setVt(const Vector2f &a, const Vector2f &b, const Vector2f &c) {
-    t << b - a, c - a, a;
+  void setVt(const Vector2d &a, const Vector2d &b, const Vector2d &c) {
+    vt.matrix().topRows<2>() << b - a, c - a, a;
   }
 
-  void setVn(const Vector3f &a, const Vector3f &b, const Vector3f &c) {
-    n << b - a, c - a, a;
+  void setVn(const Vector3d &a, const Vector3d &b, const Vector3d &c) {
+    vn << b - a, c - a, a;
   }
 
  protected:
-  Vector3f o;
-  Eigen::Matrix3f tr, n;
-  Eigen::Matrix2f t;
+  Vector3d o;
+  Eigen::Matrix3d tr, vn;
+  Eigen::Affine2d vt;
 };
 
 #endif  // TRIANGLE_H

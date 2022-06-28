@@ -7,13 +7,13 @@ class Portal : public Transform {
  public:
   Portal() = delete;
 
-  Portal(const Affine3f &transform, Object3D *obj) : Transform(transform, obj) {
+  Portal(const Affine3d &transform, Object3D *obj) : Transform(transform, obj) {
     bbox.extend(obj->getBBox());
   }
 
   ~Portal() override = default;
 
-  bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
+  bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override {
     bool result = false;
     if (o->intersect(r, h, obj, tmin)) {
       obj = this;
@@ -35,7 +35,7 @@ class Portal : public Transform {
   }
 
  private:
-  Affine3f m;
+  Affine3d m;
 };
 
 #endif  // PORTAL_H

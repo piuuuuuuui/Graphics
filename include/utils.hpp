@@ -11,22 +11,22 @@
 
 #define RAND_U uniform(gen)
 #define RAND_N gauss(gen)
-#define RAND_VEC Vector3f(gauss(gen), gauss(gen), gauss(gen)).normalized()
+#define RAND_VEC Vector3d(gauss(gen), gauss(gen), gauss(gen)).normalized()
 
 using namespace std;
 using namespace chrono;
-using Eigen::Vector2f, Eigen::Vector3f, Eigen::Affine3f, Eigen::Matrix4f;
+using Eigen::Vector2d, Eigen::Vector3d, Eigen::Affine3d, Eigen::Matrix4d;
 
 const int NUM_ITERS = 256;
 const int MAX_DEPTH = 16;
-const float FPS = NUM_ITERS / 1.f;
+const double FPS = NUM_ITERS / 1.;
 const int NEWTON_ITERS = 8;
 
 extern int iter;
 
 static random_device rd;
 static mt19937 gen(rd());
-static uniform_real_distribution<float> uniform(0.0, 1.0);
-static normal_distribution<float> gauss(0.0, 1.0);
+static uniform_real_distribution<double> uniform(0.0, 1.0);
+static normal_distribution<double> gauss(0.0, 1.0);
 
 #endif  // UTILS_H

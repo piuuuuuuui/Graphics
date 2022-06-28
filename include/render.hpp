@@ -27,27 +27,27 @@ class PTRenderer {
     num_threads(16)  // OpenMP
       for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
-          Ray ray = camera->generateRay(Vector2f(x + RAND_U, y + RAND_U));
-          Vector3f& color = image.GetPixel(x, y);
+          Ray ray = camera->generateRay(Vector2d(x + RAND_U, y + RAND_U));
+          Vector3d& color = image.GetPixel(x, y);
           color = (color * iter + getColor(ray)) / (iter + 1);
         }
       }
       image.SaveImage("output/0.bmp");
       auto end = high_resolution_clock::now();
-      float time_ms = duration_cast<nanoseconds>(end - begin).count() / 1e6;
+      double time_ms = duration_cast<nanoseconds>(end - begin).count() / 1e6;
       cout << time_ms << "ms" << endl;
       ++iter;
     }
     return image;
   }
 
-  Vector3f getColor(const Ray& camRay) {
+  Vector3d getColor(const Ray& camRay) {
     Group* group = scene.getGroup();
     Ray ray = camRay;
     for (int depth = 0; depth < MAX_DEPTH; ++depth) {
       Hit hit;
       Object3D* obj = nullptr;
-      if (!group->intersect(ray, hit, obj, 1e-5f))
+      if (!group->intersect(ray, hit, obj, 1e-5))
         return ray.colorTrans * scene.getBackgroundColor();
       if (!obj->getNextRay(hit, ray)) break;
     }

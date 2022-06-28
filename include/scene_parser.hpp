@@ -32,7 +32,7 @@ class SceneParser {
 
   Camera *getCamera() const { return camera; }
 
-  Vector3f getBackgroundColor() const { return background_color; }
+  Vector3d getBackgroundColor() const { return background_color; }
 
   int getNumObjects() const { return num_objects; }
 
@@ -75,15 +75,15 @@ class SceneParser {
 
   int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 
-  Vector3f readVector3f();
-  bool parseMatrix4f(char token[MAX_PARSER_TOKEN_LENGTH], Affine3f &tr);
+  Vector3d readVector3d();
+  bool parseMatrix4d(char token[MAX_PARSER_TOKEN_LENGTH], Affine3d &tr);
 
-  float readFloat();
+  double readDouble();
   int readInt();
 
   FILE *file;
   Camera *camera;
-  Vector3f background_color;
+  Vector3d background_color;
   int num_objects;
   Object3D **objects;
   int num_materials;

@@ -6,9 +6,9 @@
 class Material;
 
 struct Hit {
-  float t = FLT_MAX;
-  float u = 0.f, v = 0.f;
-  Vector3f point = Vector3f::Zero(), normal = Vector3f::Zero();
+  double t = DBL_MAX;
+  double u = 0., v = 0.;
+  Vector3d point = Vector3d::Zero(), normal = Vector3d::Zero();
   Material *material = nullptr;
 };
 

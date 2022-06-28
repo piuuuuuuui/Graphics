@@ -18,7 +18,7 @@ void WriteByte(FILE *file, unsigned char b) {
   assert(success == 1);
 }
 
-unsigned char ClampColorComponent(float c) {
+unsigned char ClampColorComponent(double c) {
   int tmp = int(c * 255);
 
   if (tmp < 0) {
@@ -64,7 +64,7 @@ void Image::SaveTGA(const char *filename) const {
   // flip y so that (0,0) is bottom left corner
   for (int y = height - 1; y >= 0; y--) {
     for (int x = 0; x < width; ++x) {
-      Vector3f v = GetPixel(x, y);
+      Vector3d v = GetPixel(x, y);
       // note reversed order: b, g, r
       WriteByte(file, ClampColorComponent(v[2]));
       WriteByte(file, ClampColorComponent(v[1]));
@@ -113,7 +113,7 @@ Image *Image::LoadTGA(const char *filename) {
       b = ReadByte(file);
       g = ReadByte(file);
       r = ReadByte(file);
-      Vector3f color(r / 255.0, g / 255.0, b / 255.0);
+      Vector3d color(r / 255.0, g / 255.0, b / 255.0);
       answer->SetPixel(x, y, color);
     }
   }
@@ -140,7 +140,7 @@ void Image::SavePPM(const char *filename) const {
   // flip y so that (0,0) is bottom left corner
   for (int y = height - 1; y >= 0; y--) {
     for (int x = 0; x < width; ++x) {
-      Vector3f v = GetPixel(x, y);
+      Vector3d v = GetPixel(x, y);
       fputc(ClampColorComponent(v[0]), file);
       fputc(ClampColorComponent(v[1]), file);
       fputc(ClampColorComponent(v[2]), file);
@@ -176,7 +176,7 @@ Image *Image::LoadPPM(const char *filename) {
       r = fgetc(file);
       g = fgetc(file);
       b = fgetc(file);
-      Vector3f color(r / 255.0, g / 255.0, b / 255.0);
+      Vector3d color(r / 255.0, g / 255.0, b / 255.0);
       answer->SetPixel(x, y, color);
     }
   }
@@ -226,7 +226,7 @@ int Image::SaveBMP(const char *filename) {
   int i, j, ipos;
   int bytesPerLine;
   unsigned char *line;
-  Vector3f *rgb = data;
+  Vector3d *rgb = data;
   FILE *file;
   struct BMPHeader bmph;
 

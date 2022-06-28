@@ -5,14 +5,14 @@
 
 class Material {
  public:
-  Vector3f emissiveColor = Vector3f::Zero();
-  Vector3f diffuseColor = Vector3f::Ones();
-  float roughness = 1.f;
-  Vector3f specularColor = Vector3f::Ones();
-  float transparency = 0.f;
-  float refractiveIndex = 1.f;
-  Vector3f refractiveColor = Vector3f::Ones();
-  Matrix4f translucency = Matrix4f::Zero();
+  Vector3d emissiveColor = Vector3d::Zero();
+  Vector3d diffuseColor = Vector3d::Ones();
+  double roughness = 1.;
+  Vector3d specularColor = Vector3d::Ones();
+  double transparency = 0.;
+  double refractiveIndex = 1.;
+  Vector3d refractiveColor = Vector3d::Ones();
+  Matrix4d translucency = Matrix4d::Zero();
 };
 
 #endif  // MATERIAL_H

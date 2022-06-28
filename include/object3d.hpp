@@ -6,19 +6,19 @@
 #include "ray.hpp"
 #include "utils.hpp"
 
-class AABB : public Eigen::AlignedBox3f {
+class AABB : public Eigen::AlignedBox3d {
  public:
   AABB() = default;
 
-  AABB(const Eigen::AlignedBox3f &bbox) : Eigen::AlignedBox3f(bbox) {}
+  AABB(const Eigen::AlignedBox3d &bbox) : Eigen::AlignedBox3d(bbox) {}
 
   ~AABB() = default;
 
   /** \returns true if r intersects with *this within (tmin, tmax).
    * Also updates tmin and tmax. */
-  inline bool intersect(const Ray &r, float &tmin, float &tmax) {
+  inline bool intersect(const Ray &r, double &tmin, double &tmax) {
     for (int i = 0; i < 3; ++i) {
-      float dir_i = r.direction[i], t1, t2;
+      double dir_i = r.direction[i], t1, t2;
       if (0 <= dir_i) {
         t1 = (min()[i] - r.origin[i]) / dir_i;
         t2 = (max()[i] - r.origin[i]) / dir_i;
@@ -37,25 +37,28 @@ class AABB : public Eigen::AlignedBox3f {
 // Base class for all 3d entities.
 class Object3D {
  public:
-  Object3D() : material(nullptr) {}
+  Object3D() : mtl(nullptr) {}
 
   virtual ~Object3D() = default;
 
-  explicit Object3D(Material *material) { this->material = material; }
+  explicit Object3D(Material *material) : mtl(material) {}
 
   // Intersect Ray with this object. If hit, store information in hit structure.
-  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) = 0;
+  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) = 0;
 
   virtual bool getNextRay(const Hit &hit, Ray &ray) {
-    Vector3f &dir = ray.direction;
-    Affine3f &tr = ray.colorTrans;
-    Vector3f normal = getNormal(hit.normal, hit.u, hit.v);
-    float roughness = material->roughness;
-    float n = material->refractiveIndex;
-    Matrix4f m = material->translucency;
+    Vector3d &dir = ray.direction;
+    Affine3d &tr = ray.colorTrans;
+
+    Material material = getMaterial(hit.material, hit.u, hit.v);
+    Vector3d normal = getNormal(hit.normal, hit.u, hit.v);
+
+    double roughness = material.roughness;
+    double n = material.refractiveIndex;
+    Matrix4d m = material.translucency;
 
     // orient normal and others
-    float cosI = -dir.dot(normal);
+    double cosI = -dir.dot(normal);
     if (cosI < 0) {
       cosI = -cosI;
       normal = -normal;
@@ -67,28 +70,28 @@ class Object3D {
 
     // update color
     tr *= (ray.translucency * hit.t).exp();
-    tr.translate(material->emissiveColor);
+    tr.translate(material.emissiveColor);
 
     // Lambertian diffuse reflection
-    tr.scale(Vector3f::Constant(1.f - roughness) +
-             material->diffuseColor * roughness);
-    if ((tr.linear() * Vector3f::Ones()).maxCoeff() < 1e-2f) return false;
-    dir = dir * (1.f - roughness) +
+    tr.scale(Vector3d::Constant(1. - roughness) +
+             material.diffuseColor * roughness);
+    if ((tr.linear() * Vector3d::Ones()).maxCoeff() < 1e-2) return false;
+    dir = dir * (1. - roughness) +
           (RAND_VEC - normal).normalized() * roughness;  // TODO: fix
 
     // reflection & refraction
-    if (RAND_U < material->transparency && 0 < n) {
-      Vector3f sinI = dir.cross(normal), sinT = normal.cross(sinI) / n;
-      float squaredCosT = 1 - sinT.squaredNorm();
+    if (RAND_U < material.transparency && 0 < n) {
+      Vector3d sinI = dir.cross(normal), sinT = normal.cross(sinI) / n;
+      double squaredCosT = 1 - sinT.squaredNorm();
       if (0 < squaredCosT) {
-        float cosT = sqrt(squaredCosT),
-              RS = pow((n * cosI - cosT) / (n * cosI + cosT), 2),
-              RP = pow((n * cosT - cosI) / (n * cosT + cosI), 2),
-              R = (RS + RP) / 2;  // Fresnel reflectivity
+        double cosT = sqrt(squaredCosT),
+               RS = pow((n * cosI - cosT) / (n * cosI + cosT), 2),
+               RP = pow((n * cosT - cosI) / (n * cosT + cosI), 2),
+               R = (RS + RP) / 2;  // Fresnel reflectivity
         if (R < RAND_U) {
           // refraction
-          tr.scale(material->refractiveColor);
-          if ((tr.linear() * Vector3f::Ones()).maxCoeff() < 1e-2f) return false;
+          tr.scale(material.refractiveColor);
+          if ((tr.linear() * Vector3d::Ones()).maxCoeff() < 1e-2) return false;
           dir = sinT - normal * cosT;
           ray.refractiveIndex *= n;
           ray.translucency += m;
@@ -97,8 +100,8 @@ class Object3D {
       }
     }
     // specular reflection
-    tr.scale(material->specularColor);
-    if ((tr.linear() * Vector3f::Ones()).maxCoeff() < 1e-2f) return false;
+    tr.scale(material.specularColor);
+    if ((tr.linear() * Vector3d::Ones()).maxCoeff() < 1e-2) return false;
     dir -= normal * 2 * normal.dot(dir);
     return true;
   }
@@ -106,9 +109,19 @@ class Object3D {
   const AABB &getBBox() const { return bbox; }
 
  protected:
-  virtual Vector3f getNormal(const Vector3f &n, float, float) { return n; }
+  virtual Vector3d getNormal(const Vector3d &normal, double u, double v) {
+    Vector3d n = normal;
+    // TODO
+    return n;
+  }
 
-  Material *material;
+  virtual Material getMaterial(const Material *material, double u, double v) {
+    Material m = *material;
+    // TODO
+    return m;
+  }
+
+  Material *mtl;
   AABB bbox;
 };
 

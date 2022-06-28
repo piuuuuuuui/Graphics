@@ -8,16 +8,16 @@ class Ray {
  public:
   Ray() = delete;
 
-  Ray(const Vector3f &o, const Vector3f &d) : origin(o), direction(d) {}
+  Ray(const Vector3d &o, const Vector3d &d) : origin(o), direction(d) {}
 
-  Vector3f pointAtParameter(float t) const { return origin + direction * t; }
+  Vector3d pointAtParameter(double t) const { return origin + direction * t; }
 
-  Vector3f origin;
-  Vector3f direction;
+  Vector3d origin;
+  Vector3d direction;
 
-  float refractiveIndex = 1.f;
-  Matrix4f translucency = Matrix4f::Zero();
-  Affine3f colorTrans = Affine3f::Identity();
+  double refractiveIndex = 1.;
+  Matrix4d translucency = Matrix4d::Zero();
+  Affine3d colorTrans = Affine3d::Identity();
 };
 
 inline ostream &operator<<(ostream &os, const Ray &r) {

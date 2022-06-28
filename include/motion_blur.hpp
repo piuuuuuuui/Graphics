@@ -9,9 +9,9 @@ class MotionBlur : public Transform {
  public:
   MotionBlur() = delete;
 
-  MotionBlur(const Affine3f &transform, Object3D *obj)
+  MotionBlur(const Affine3d &transform, Object3D *obj)
       : Transform(transform, obj) {
-    Eigen::MatrixPower<Matrix4f> tr_pow(tr.matrix()), inv_pow(inv.matrix());
+    Eigen::MatrixPower<Matrix4d> tr_pow(tr.matrix()), inv_pow(inv.matrix());
     tr_pows.resize(NUM_ITERS);
     inv_pows.resize(NUM_ITERS);
     for (int i = 0; i < NUM_ITERS; ++i) {
@@ -23,7 +23,7 @@ class MotionBlur : public Transform {
 
   ~MotionBlur() {}
 
-  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
+  virtual bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) {
     if (__glibc_unlikely(frame != iter)) {
       frame = iter;
       tr = tr_pows.at(frame);
@@ -34,7 +34,7 @@ class MotionBlur : public Transform {
 
  protected:
   int frame = -1;
-  vector<Affine3f> tr_pows, inv_pows;
+  vector<Affine3d> tr_pows, inv_pows;
 };
 
 #endif  // MOTION_BLUR_H

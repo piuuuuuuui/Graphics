@@ -5,46 +5,45 @@
 
 class Sphere : public Object3D {
  public:
-  Sphere()
-      : center(Vector3f::Zero()), radius(1.f) {}  // unit ball at the center
+  Sphere() : center(Vector3d::Zero()), radius(1.) {}  // unit ball at the center
 
-  Sphere(const Vector3f &center, float radius, Material *material)
+  Sphere(const Vector3d &center, double radius, Material *material)
       : Object3D(material),
         center(center),
         radius(radius),
         rr(radius * radius) {
-    bbox.min() = center - Vector3f::Constant(radius);
-    bbox.max() = center + Vector3f::Constant(radius);
+    bbox.min() = center - Vector3d::Constant(radius);
+    bbox.max() = center + Vector3d::Constant(radius);
   }
 
   ~Sphere() override = default;
 
-  bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
-    Vector3f vec = center - r.origin, dir = r.direction;
-    float kk = dir.squaredNorm();
-    float t0 = vec.dot(dir) / kk;
-    float dd = (dir * t0 - vec).squaredNorm();
+  bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override {
+    Vector3d vec = center - r.origin, dir = r.direction;
+    double kk = dir.squaredNorm();
+    double t0 = vec.dot(dir) / kk;
+    double dd = (dir * t0 - vec).squaredNorm();
     if (!(dd < rr)) return false;
-    float t = t0 - sqrt((rr - dd) / kk);  // first intersection
+    double t = t0 - sqrt((rr - dd) / kk);  // first intersection
     if (!(t < h.t)) return false;
     if (!(tmin < t)) {
       t = t0 * 2 - t;  // second intersection
       if (!(tmin < t && t < h.t)) return false;
     }
-    Vector3f p = r.pointAtParameter(t), n = (p - center) / radius;
+    Vector3d p = r.pointAtParameter(t), n = (p - center) / radius;
     h.t = t;
     h.u = 0.5 + atan2(n.x(), n.z()) / (2 * M_PI);
     h.v = 0.5 - asin(n.y()) / M_PI;
     h.point = p;
     h.normal = n;
-    h.material = material;
+    h.material = mtl;
     obj = this;
     return true;
   }
 
  protected:
-  Vector3f center;
-  float radius, rr;  // rr: squared radius
+  Vector3d center;
+  double radius, rr;  // rr: squared radius
 };
 
 #endif

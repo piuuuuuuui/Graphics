@@ -6,7 +6,7 @@
 
 class Camera {
  public:
-  Camera(const Vector3f &center, const Vector3f &direction, const Vector3f &up,
+  Camera(const Vector3d &center, const Vector3d &direction, const Vector3d &up,
          int imgW, int imgH) {
     this->center = center;
     this->direction = direction.normalized();
@@ -17,7 +17,7 @@ class Camera {
   }
 
   // Generate rays for each screen-space coordinate
-  virtual Ray generateRay(const Vector2f &point) = 0;
+  virtual Ray generateRay(const Vector2d &point) = 0;
   virtual ~Camera() = default;
 
   int getWidth() const { return width; }
@@ -25,10 +25,10 @@ class Camera {
 
  protected:
   // Extrinsic parameters
-  Vector3f center;
-  Vector3f direction;
-  Vector3f up;
-  Vector3f horizontal;
+  Vector3d center;
+  Vector3d direction;
+  Vector3d up;
+  Vector3d horizontal;
   // Intrinsic parameters
   int width;
   int height;
@@ -36,65 +36,65 @@ class Camera {
 
 class PerspectiveCamera : public Camera {
  public:
-  PerspectiveCamera(const Vector3f &center, const Vector3f &direction,
-                    const Vector3f &up, int imgW, int imgH, float angle)
+  PerspectiveCamera(const Vector3d &center, const Vector3d &direction,
+                    const Vector3d &up, int imgW, int imgH, double angle)
       : Camera(center, direction, up, imgW, imgH) {
     // angle is in radian.
-    o = Vector2f(width / 2.f, height / 2.f);
+    o = Vector2d(width / 2., height / 2.);
     f = this->direction * (height / (tan(angle / 2) * 2));
   }
 
-  Ray generateRay(const Vector2f &point) override {
-    Vector2f op = point - o;
+  Ray generateRay(const Vector2d &point) override {
+    Vector2d op = point - o;
     return Ray(center, (f + horizontal * op.x() + up * op.y()).normalized());
   }
 
  protected:
-  Vector2f o;  // origin, optical center
-  Vector3f f;  // focus vector
+  Vector2d o;  // origin, optical center
+  Vector3d f;  // focus vector
 };
 
 class OrthographicCamera : public Camera {
  public:
-  OrthographicCamera(const Vector3f &center, const Vector3f &direction,
-                     const Vector3f &up, int imgW, int imgH, float scale = 1)
+  OrthographicCamera(const Vector3d &center, const Vector3d &direction,
+                     const Vector3d &up, int imgW, int imgH, double scale = 1)
       : Camera(center, direction, up, imgW, imgH), s(scale) {
-    o = Vector2f(width / 2.f, height / 2.f);
+    o = Vector2d(width / 2., height / 2.);
   }
 
-  Ray generateRay(const Vector2f &point) override {
-    Vector2f op = (point - o) * this->s;
+  Ray generateRay(const Vector2d &point) override {
+    Vector2d op = (point - o) * this->s;
     return Ray(center + horizontal * op.x() + up * op.y(), direction);
   }
 
  protected:
-  Vector2f o;  // origin, optical center
-  float s;     // scale
+  Vector2d o;  // origin, optical center
+  double s;     // scale
 };
 
 class RealCamera : public Camera {
  public:
-  RealCamera(const Vector3f &center, const Vector3f &direction,
-             const Vector3f &up, int imgW, int imgH, float angle, float d,
-             float a)
+  RealCamera(const Vector3d &center, const Vector3d &direction,
+             const Vector3d &up, int imgW, int imgH, double angle, double d,
+             double a)
       : Camera(center, direction, up, imgW, imgH), dist(d), aperture(a) {
     // angle is in radian.
-    o = Vector2f(width / 2.f, height / 2.f);
+    o = Vector2d(width / 2., height / 2.);
     f = this->direction * (height / (tan(angle / 2) * 2));
     k = f.norm() / d;
   }
 
-  Ray generateRay(const Vector2f &point) override {
-    Vector2f op = point - o;
-    Vector3f var = aperture * (horizontal * RAND_N + up * RAND_N);
+  Ray generateRay(const Vector2d &point) override {
+    Vector2d op = point - o;
+    Vector3d var = aperture * (horizontal * RAND_N + up * RAND_N);
     return Ray(center + var,
                (f + horizontal * op.x() + up * op.y() - var * k).normalized());
   }
 
  protected:
-  Vector2f o;               // origin, optical center
-  Vector3f f;               // focus vector
-  float k, dist, aperture;  // k = f / dist
+  Vector2d o;               // origin, optical center
+  Vector3d f;               // focus vector
+  double k, dist, aperture;  // k = f / dist
 };
 
 #endif  // CAMERA_H

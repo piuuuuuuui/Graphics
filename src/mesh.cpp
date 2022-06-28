@@ -5,8 +5,8 @@
 #include <sstream>
 
 Mesh::Mesh(const char *filename, Material *material) {
-  vector<Vector3f> v, vn;
-  vector<Vector2f> vt;
+  vector<Vector3d> v, vn;
+  vector<Vector2d> vt;
   vector<array<TriangleIndex, 3>> f;
   vector<Triangle *> triangles;
 
@@ -28,16 +28,15 @@ Mesh::Mesh(const char *filename, Material *material) {
     stringstream ss(line);
     ss >> tok;
     if (tok == vTok) {
-      Vector3f vec;
+      Vector3d vec;
       ss >> vec[0] >> vec[1] >> vec[2];
       v.push_back(vec);
     } else if (tok == vtTok) {
-      Vector2f texcoord;
-      ss >> texcoord[0];
-      ss >> texcoord[1];
-      vt.push_back(texcoord);
+      Vector2d vec;
+      ss >> vec[0] >> vec[1];
+      vt.push_back(vec);
     } else if (tok == vnTok) {
-      Vector3f vec;
+      Vector3d vec;
       ss >> vec[0] >> vec[1] >> vec[2];
       vn.push_back(vec);
     } else if (tok == fTok) {
@@ -88,6 +87,8 @@ Mesh::Mesh(vector<Triangle *>::iterator begin,
   addObject(new Mesh(begin, begin + n / 2));
 }
 
-bool Mesh::intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
-  return Group::intersect(r, h, obj, tmin);
+bool Mesh::intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) {
+  if (!Group::intersect(r, h, obj, tmin)) return false;
+  obj = this;
+  return true;
 }

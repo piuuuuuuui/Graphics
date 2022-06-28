@@ -11,7 +11,7 @@ class Image {
   Image(int w, int h) {
     width = w;
     height = h;
-    data = new Vector3f[width * height];
+    data = new Vector3d[width * height];
   }
 
   ~Image() { delete[] data; }
@@ -20,19 +20,19 @@ class Image {
 
   int Height() const { return height; }
 
-  Vector3f &GetPixel(int x, int y) const {
+  Vector3d &GetPixel(int x, int y) const {
     assert(x >= 0 && x < width);
     assert(y >= 0 && y < height);
     return data[y * width + x];
   }
 
-  void SetAllPixels(const Vector3f &color) {
+  void SetAllPixels(const Vector3d &color) {
     for (int i = 0; i < width * height; ++i) {
       data[i] = color;
     }
   }
 
-  void SetPixel(int x, int y, const Vector3f &color) {
+  void SetPixel(int x, int y, const Vector3d &color) {
     assert(x >= 0 && x < width);
     assert(y >= 0 && y < height);
     data[y * width + x] = color;
@@ -53,7 +53,7 @@ class Image {
  private:
   int width;
   int height;
-  Vector3f *data;
+  Vector3d *data;
 };
 
 #endif  // IMAGE_H

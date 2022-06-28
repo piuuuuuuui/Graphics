@@ -29,7 +29,7 @@ class Mesh : public Group {
     int x[3];
   };
 
-  bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override;
+  bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override;
 };
 
 #endif

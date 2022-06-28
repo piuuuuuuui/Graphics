@@ -8,20 +8,20 @@ class RevSurface : public Object3D {
   RevSurface(Curve *curve, Material *material) : Object3D(material), c(curve) {
     bbox = c->getBBox();
     rr = max(bbox.min()({0, 2}).norm(), bbox.max()({0, 2}).norm());
-    bbox.min()({0, 2}) = Vector2f::Constant(-rr);
-    bbox.max()({0, 2}) = Vector2f::Constant(rr);
+    bbox.min()({0, 2}) = Vector2d::Constant(-rr);
+    bbox.max()({0, 2}) = Vector2d::Constant(rr);
     rr *= rr;
     newton_times = c->getControls().size() * 2;
   }
 
   ~RevSurface() override { delete c; }
 
-  bool intersect(const Ray &r, Hit &h, Object3D *&obj, float tmin) override {
+  bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override {
     // intersect with the bounding cylinder
-    Vector2f orig = -r.origin({0, 2}), dir = r.direction({0, 2});
-    float kk = dir.squaredNorm();
-    float t = orig.dot(dir) / kk;
-    float dd = (dir * t - orig).squaredNorm();
+    Vector2d orig = -r.origin({0, 2}), dir = r.direction({0, 2});
+    double kk = dir.squaredNorm();
+    double t = orig.dot(dir) / kk;
+    double dd = (dir * t - orig).squaredNorm();
     if (!(dd < rr)) return false;
     tmin = max(tmin, t - sqrt((rr - dd) / kk));
 
@@ -32,28 +32,28 @@ class RevSurface : public Object3D {
     return result;
   }
 
-  bool newton(const Ray &r, Hit &h, Object3D *&obj, float tmin) {
+  bool newton(const Ray &r, Hit &h, Object3D *&obj, double tmin) {
     // init x := (t,u,v)
-    Vector3f x(tmin, RAND_U, RAND_U * (1.f - 1e-6f));
+    Vector3d x(tmin, RAND_U, RAND_U * (1. - 1e-6));
 
     // solve f(t,u,v) := p(t)-p(u,v) = 0
-    Eigen::Matrix3f jacobian;       // jacobian of f
+    Eigen::Matrix3d jacobian;       // jacobian of f
     jacobian.col(0) = r.direction;  // df/dt
     for (int i = 0; i < NEWTON_ITERS; ++i) {
-      Vector3f p, tp;  // point and tangent
+      Vector3d p, tp;  // point and tangent
       compute(x[1], x[2], p, tp);
-      Vector3f f = r.pointAtParameter(x[0]) - p;
-      if (f.squaredNorm() < 1e-12f) {
+      Vector3d f = r.pointAtParameter(x[0]) - p;
+      if (f.squaredNorm() < 1e-12) {
         h.t = x[0];
         h.u = x[1];
         h.v = x[2];
         h.point = p;
-        h.normal = (tp.cross(Vector3f::UnitY().cross(p))).normalized();
-        h.material = material;
+        h.normal = (tp.cross(Vector3d::UnitY().cross(p))).normalized();
+        h.material = mtl;
         obj = this;
         return true;
       }
-      jacobian.col(1) = -Vector3f::UnitY().cross(p) * (2 * M_PI);  // df/du
+      jacobian.col(1) = -Vector3d::UnitY().cross(p) * (2 * M_PI);  // df/du
       jacobian.col(2) = -tp;                                       // df/dv
       x -= jacobian.inverse() * f;
       for (auto x_i : x)
@@ -62,14 +62,14 @@ class RevSurface : public Object3D {
       // boundary check
       x[0] = max(min(x[0], h.t), tmin);
       x[1] -= floor(x[1]);
-      x[2] = max(min(x[2], 1.f - 1e-6f), 0.f);
+      x[2] = max(min(x[2], 1. - 1e-6), 0.);
     }
     return false;
   }
 
-  void compute(float u, float v, Vector3f &p, Vector3f &tp) {
-    Affine3f rot = Affine3f::Identity();
-    rot.rotate(Eigen::AngleAxisf(u * (2 * M_PI), Vector3f::UnitY()));
+  void compute(double u, double v, Vector3d &p, Vector3d &tp) {
+    Affine3d rot = Affine3d::Identity();
+    rot.rotate(Eigen::AngleAxisd(u * (2 * M_PI), Vector3d::UnitY()));
     c->compute(v, p, tp);
     p = rot * p;
     tp = rot.linear() * tp;
@@ -77,7 +77,7 @@ class RevSurface : public Object3D {
 
  private:
   Curve *c;
-  float rr;  // squared radius
+  double rr;  // squared radius
   int newton_times;
 };
 
