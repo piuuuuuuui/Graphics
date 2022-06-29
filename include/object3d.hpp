@@ -28,7 +28,7 @@ class AABB : public Eigen::AlignedBox3d {
       }
       tmin = std::max(tmin, t1);
       tmax = std::min(tmax, t2);
-      if (!(tmin < tmax)) return false;
+      if (!(tmin <= tmax)) return false;
     }
     return true;
   }
@@ -70,7 +70,6 @@ class Object3D {
 
     // transmission
     tr *= (ray.translucency * hit.t).exp();
-    if (material.opacity < RAND_U) return true;
 
     // emission
     tr.translate(material.emissiveColor);
@@ -81,7 +80,7 @@ class Object3D {
     dir = dir * (1. - roughness) + (RAND_VEC - normal).normalized() * roughness;
 
     // reflection or refraction
-    if (0 < n) {
+    if (material.opacity < RAND_U && 0 < n) {
       Vector3d sinI = dir.cross(normal), sinT = normal.cross(sinI) / n;
       double squaredCosT = 1 - sinT.squaredNorm();
       if (0 < squaredCosT) {
