@@ -19,7 +19,7 @@ using namespace std;
 using namespace chrono;
 using Eigen::Vector2d, Eigen::Vector3d, Eigen::Affine3d, Eigen::Matrix4d;
 
-const int NUM_ITERS = 256;
+const int NUM_ITERS = 1024;
 const int MAX_DEPTH = 16;
 const double FPS = NUM_ITERS / 1.;
 const int NEWTON_ITERS = 8;

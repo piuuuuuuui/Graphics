@@ -47,7 +47,7 @@ class PTRenderer {
       Hit hit;
       Object3D* obj = nullptr;
       if (!group->intersect(ray, hit, obj, 1e-5))
-        return ray.colorTrans * scene.getBackgroundColor();
+        return ray.colorTrans * scene.getBackgroundColor(ray.direction);
       if (!obj->getNextRay(hit, ray)) break;
     }
     return ray.colorTrans.translation();

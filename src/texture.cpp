@@ -25,12 +25,12 @@ VectorXd Texture::get(double u, double v) const {
   v = ceil(v) - v;
   double uf, vf;
   uf = modf(u * w, &u);
-  vf = modf(v * w, &v);
+  vf = modf(v * h, &v);
   int ui = (int)u, vi = (int)v;
   // bilinear interpolation
   result += (1 - uf) * (1 - vf) * get(ui, vi);
-  result += uf * (1 - vf) * get(ui + 1, vi);
-  result += (1 - uf) * vf * get(ui, vi + 1);
-  result += uf * vf * get(ui + 1, vi + 1);
+  result += uf * (1 - vf) * get((ui + 1) % w, vi);
+  result += (1 - uf) * vf * get(ui, (vi + 1) % h);
+  result += uf * vf * get((ui + 1) % w, (vi + 1) % h);
   return result;
 }

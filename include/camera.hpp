@@ -69,7 +69,7 @@ class OrthographicCamera : public Camera {
 
  protected:
   Vector2d o;  // origin, optical center
-  double s;     // scale
+  double s;    // scale
 };
 
 class RealCamera : public Camera {
@@ -92,9 +92,37 @@ class RealCamera : public Camera {
   }
 
  protected:
-  Vector2d o;               // origin, optical center
-  Vector3d f;               // focus vector
-  double k, dist, aperture;  // k = f / dist
+  Vector2d o;                // origin, optical center
+  Vector3d f;                // focus vector
+  double k, dist, aperture;  // k = f/dist
+};
+
+class FisheyeCamera : public Camera {
+ public:
+  FisheyeCamera(const Vector3d &center, const Vector3d &direction,
+                const Vector3d &up, int imgW, int imgH, double angle, double d,
+                double a)
+      : Camera(center, direction, up, imgW, imgH), dist(d), aperture(a) {
+    // angle is in radian.
+    o = Vector2d(width / 2., height / 2.);
+    D = angle / height;
+    k = 1 / dist;
+  }
+
+  Ray generateRay(const Vector2d &point) override {
+    Vector2d op = (point - o) * D;
+    double angle = op.norm();
+    op /= angle;
+    Vector3d var = aperture * (horizontal * RAND_N + up * RAND_N);
+    return Ray(center + var,
+               (direction * cos(angle) +
+                (horizontal * op.x() + up * op.y()) * sin(angle) - var * k)
+                   .normalized());
+  }
+
+ protected:
+  Vector2d o;                   // origin, optical center
+  double D, k, dist, aperture;  // D = 1/f, k = 1/dist
 };
 
 #endif  // CAMERA_H

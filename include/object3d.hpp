@@ -51,7 +51,7 @@ class Object3D {
     Affine3d &tr = ray.colorTrans;
 
     Material material = getMaterial(hit.material, hit.u, hit.v);
-    Vector3d normal = getNormal(hit.normal, hit.u, hit.v);
+    Vector3d normal = getNormal(hit.normal, hit.material, hit.u, hit.v);
 
     double roughness = material.roughness;
     double n = material.refractiveIndex;
@@ -110,9 +110,10 @@ class Object3D {
   const AABB &getBBox() const { return bbox; }
 
  protected:
-  virtual Vector3d getNormal(const Vector3d &normal, double u, double v) {
+  virtual Vector3d getNormal(const Vector3d &normal, const Material *material,
+                             double u, double v) {
     Vector3d n = normal;
-    // TODO
+    // if (nullptr != material->bumpMap) material->bumpMap->get(u, v);
     return n;
   }
 

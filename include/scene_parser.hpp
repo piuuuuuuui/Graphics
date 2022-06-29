@@ -3,6 +3,7 @@
 
 #include <cassert>
 
+#include "texture.hpp"
 #include "utils.hpp"
 
 class Camera;
@@ -32,7 +33,15 @@ class SceneParser {
 
   Camera *getCamera() const { return camera; }
 
-  Vector3d getBackgroundColor() const { return background_color; }
+  Vector3d getBackgroundColor(Vector3d dir) const {
+    dir.normalize();
+    Vector3d color = background_color;
+    if (nullptr != background_texture)
+      color = color.cwiseProduct(
+          background_texture->get(0.5 + atan2(dir.x(), dir.z()) / (2 * M_PI),
+                                  0.5 - asin(dir.y()) / M_PI));
+    return color;
+  }
 
   int getNumObjects() const { return num_objects; }
 
@@ -55,6 +64,7 @@ class SceneParser {
   void parsePerspectiveCamera();
   void parseOrthographicCamera();
   void parseRealCamera();
+  void parseFisheyeCamera();
   void parseBackground();
   void parseMaterials();
   Material *parseMaterial();
@@ -84,6 +94,7 @@ class SceneParser {
   FILE *file;
   Camera *camera;
   Vector3d background_color;
+  Texture *background_texture;
   int num_objects;
   Object3D **objects;
   int num_materials;

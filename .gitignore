@@ -16,4 +16,5 @@ build/
 mesh/
 output/
 testcases/
+texture/
 *.sh

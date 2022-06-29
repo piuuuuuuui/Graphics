@@ -27,6 +27,7 @@ SceneParser::SceneParser(const char *filename) {
   group = nullptr;
   camera = nullptr;
   background_color = Vector3d(0.5, 0.5, 0.5);
+  background_texture = nullptr;
   num_objects = 0;
   objects = nullptr;
   num_materials = 0;
@@ -80,6 +81,8 @@ void SceneParser::parseFile() {
       parseOrthographicCamera();
     } else if (!strcmp(token, "RealCamera")) {
       parseRealCamera();
+    } else if (!strcmp(token, "FisheyeCamera")) {
+      parseFisheyeCamera();
     } else if (!strcmp(token, "Background")) {
       parseBackground();
     } else if (!strcmp(token, "Objects")) {
@@ -192,6 +195,42 @@ void SceneParser::parseRealCamera() {
                           dist, aperture);
 }
 
+void SceneParser::parseFisheyeCamera() {
+  char token[MAX_PARSER_TOKEN_LENGTH];
+  // read in the camera parameters
+  getToken(token);
+  assert(!strcmp(token, "{"));
+  getToken(token);
+  assert(!strcmp(token, "center"));
+  Vector3d center = readVector3d();
+  getToken(token);
+  assert(!strcmp(token, "direction"));
+  Vector3d direction = readVector3d();
+  getToken(token);
+  assert(!strcmp(token, "up"));
+  Vector3d up = readVector3d();
+  getToken(token);
+  assert(!strcmp(token, "angle"));
+  double angle_degrees = readDouble();
+  double angle_radians = Deg2Rad(angle_degrees);
+  getToken(token);
+  assert(!strcmp(token, "dist"));
+  double dist = readDouble();
+  getToken(token);
+  assert(!strcmp(token, "aperture"));
+  double aperture = readDouble();
+  getToken(token);
+  assert(!strcmp(token, "width"));
+  int width = readInt();
+  getToken(token);
+  assert(!strcmp(token, "height"));
+  int height = readInt();
+  getToken(token);
+  assert(!strcmp(token, "}"));
+  camera = new FisheyeCamera(center, direction, up, width, height,
+                             angle_radians, dist, aperture);
+}
+
 void SceneParser::parseBackground() {
   char token[MAX_PARSER_TOKEN_LENGTH];
   // read in the background color
@@ -203,6 +242,9 @@ void SceneParser::parseBackground() {
       break;
     } else if (!strcmp(token, "color")) {
       background_color = readVector3d();
+    } else if (!strcmp(token, "texture")) {
+      getToken(token);
+      background_texture = new Texture(token);
     } else {
       printf("Unknown token in parseBackground: '%s'\n", token);
       assert(0);
@@ -341,9 +383,21 @@ Material *SceneParser::parseMaterial() {
       while (parseMatrix4d(token, tr)) getToken(token);
       assert(!strcmp(token, "}"));
       answer->translucency = tr.matrix().log();
-    } else if (strcmp(token, "texture") == 0) {
-      // Optional: read in texture and draw it.
+    } else if (strcmp(token, "emissiveMap") == 0) {
       getToken(filename);
+      answer->emissiveMap = new Texture(filename);
+    } else if (strcmp(token, "diffuseMap") == 0) {
+      getToken(filename);
+      answer->diffuseMap = new Texture(filename);
+    } else if (strcmp(token, "specularMap") == 0) {
+      getToken(filename);
+      answer->specularMap = new Texture(filename);
+    } else if (strcmp(token, "opacityMap") == 0) {
+      getToken(filename);
+      answer->opacityMap = new Texture(filename);
+    } else if (strcmp(token, "bumpMap") == 0) {
+      getToken(filename);
+      answer->bumpMap = new Texture(filename);
     } else {
       assert(!strcmp(token, "}"));
       break;
