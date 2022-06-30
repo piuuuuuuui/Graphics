@@ -59,6 +59,7 @@ class Object3D {
 
     // orient normal and others
     double cosI = -dir.dot(normal);
+    if (0 < cosI * dir.dot(hit.normal)) normal = hit.normal;
     if (cosI < 0) {
       cosI = -cosI;
       normal = -normal;
@@ -67,15 +68,19 @@ class Object3D {
     }
 
     ray.origin = hit.point;
+    if (nullptr != material.bumpMap) {
+      ray.origin += hit.normal * material.bumpMap->get(hit.u, hit.v)[0] * 1e-2;
+    }
 
     // transmission
-    tr *= (ray.translucency * hit.t).exp();
+    tr *= (-ray.translucency * hit.t).exp();
 
     // emission
     tr.translate(material.emissiveColor);
 
     // Lambertian diffuse reflection
-    tr.scale(Vector3d::Constant(1. - roughness) + material.diffuseColor);
+    tr.scale(Vector3d::Constant(1. - roughness) +
+             material.diffuseColor * roughness);
     if ((tr.linear() * Vector3d::Ones()).maxCoeff() < 1e-2) return false;
     dir = dir * (1. - roughness) + (RAND_VEC - normal).normalized() * roughness;
 
@@ -109,10 +114,17 @@ class Object3D {
   const AABB &getBBox() const { return bbox; }
 
  protected:
+  virtual Vector3d getTangent(const Vector2d &dir, double u, double v) {
+    return Vector3d::Zero();
+  }
+
   virtual Vector3d getNormal(const Vector3d &normal, const Material *material,
                              double u, double v) {
     Vector3d n = normal;
-    // if (nullptr != material->bumpMap) material->bumpMap->get(u, v);
+    if (nullptr != material->bumpMap) {
+      auto t = getTangent(material->bumpMap->getGrad(u, v), u, v);
+      n = (n - t).normalized();
+    }
     return n;
   }
 

@@ -17,6 +17,9 @@ class RevSurface : public Object3D {
   ~RevSurface() override { delete c; }
 
   bool intersect(const Ray &r, Hit &h, Object3D *&obj, double tmin) override {
+    double t1 = tmin, t2 = h.t;
+    if (!bbox.intersect(r, t1, t2)) return false;
+
     // intersect with the bounding cylinder
     Vector2d orig = -r.origin({0, 2}), dir = r.direction({0, 2});
     double kk = dir.squaredNorm();
@@ -67,6 +70,7 @@ class RevSurface : public Object3D {
     return false;
   }
 
+ protected:
   void compute(double u, double v, Vector3d &p, Vector3d &tp) {
     Affine3d rot = Affine3d::Identity();
     rot.rotate(Eigen::AngleAxisd(u * (2 * M_PI), Vector3d::UnitY()));
@@ -75,7 +79,18 @@ class RevSurface : public Object3D {
     tp = rot.linear() * tp;
   }
 
- private:
+  virtual Vector3d getTangent(const Vector2d &dir, double u,
+                              double v) override {
+    Vector3d t = Vector3d::Zero();
+    t.head<2>() = dir;
+    Vector3d p, tu, tv;
+    compute(u, v, p, tv);
+    tu = Vector3d::UnitY().cross(p) * (2 * M_PI);
+    Eigen::Matrix3d tr;
+    tr << tu, tv, p;
+    return tr.inverse().transpose() * t;
+  }
+
   Curve *c;
   double rr;  // squared radius
   int newton_times;

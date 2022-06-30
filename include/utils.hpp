@@ -23,7 +23,7 @@ const int NUM_ITERS = 1024;
 const int MAX_DEPTH = 16;
 const double T_MIN = 1e-5;
 const double FPS = NUM_ITERS / 1.;
-const int NEWTON_ITERS = 8;
+const int NEWTON_ITERS = 16;
 
 extern int iter;
 

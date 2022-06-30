@@ -45,6 +45,13 @@ class Triangle : public Object3D {
   }
 
  protected:
+  virtual Vector3d getTangent(const Vector2d &dir, double u,
+                              double v) override {
+    Vector3d t = Vector3d::Zero();
+    t.head<2>() = vt.linear().transpose() * dir;
+    return tr.inverse().transpose() * t;
+  }
+
   Vector3d o;
   Eigen::Matrix3d tr, vn;
   Eigen::Affine2d vt;

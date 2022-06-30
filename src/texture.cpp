@@ -34,3 +34,11 @@ VectorXd Texture::get(double u, double v) const {
   result += uf * vf * get((ui + 1) % w, (vi + 1) % h);
   return result;
 }
+
+Vector2d Texture::getGrad(double u, double v) const {
+  Vector2d result = Vector2d::Zero();
+  if (nullptr == image) return result;
+  result[0] = (get(u + 1. / w, v) - get(u - 1. / w, v))[0] * (w / 2.);
+  result[1] = (get(u, v + 1. / h) - get(u, v - 1. / h))[0] * (h / 2.);
+  return result;
+}

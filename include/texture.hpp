@@ -15,6 +15,8 @@ class Texture {
 
   VectorXd get(double u, double v) const;
 
+  Vector2d getGrad(double u, double v) const;
+
  private:
   unsigned char *image;
   int w, h, c;

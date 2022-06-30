@@ -33,7 +33,7 @@ class Sphere : public Object3D {
     Vector3d p = r.pointAtParameter(t), n = (p - center) / radius;
     h.t = t;
     h.u = 0.5 + atan2(n.x(), n.z()) / (2 * M_PI);
-    h.v = 0.5 - asin(n.y()) / M_PI;
+    h.v = acos(n.y()) / M_PI;
     h.point = p;
     h.normal = n;
     h.material = mtl;
@@ -42,6 +42,20 @@ class Sphere : public Object3D {
   }
 
  protected:
+  virtual Vector3d getTangent(const Vector2d &dir, double u,
+                              double v) override {
+    Vector3d t = Vector3d::Zero();
+    t.head<2>() = dir;
+    u *= 2 * M_PI;
+    v *= M_PI;
+    Vector3d p = Vector3d(-sin(u) * sin(v), cos(v), -cos(u) * sin(v)) * radius,
+             tu = Vector3d::UnitY().cross(p) * (2 * M_PI),
+             tv = tu.normalized().cross(p) * M_PI;
+    Eigen::Matrix3d tr;
+    tr << tu, tv, p;
+    return tr.inverse().transpose() * t;
+  }
+
   Vector3d center;
   double radius, rr;  // rr: squared radius
 };

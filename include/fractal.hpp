@@ -9,10 +9,10 @@ class Fractal : public Group {
   Fractal() = delete;
 
   Fractal(const vector<Affine3d> &transforms, Object3D *obj) {
-    objects.push_back(obj);
-    bbox = obj->getBBox();
+    addObject(obj);
     for (auto tr : transforms) {
       objects.push_back(new Transform(tr, this));
+      ++num_objects;
       vector<Eigen::Vector4d> cols;
       Eigen::EigenSolver<Matrix4d> es(tr.matrix());
       for (int i = 0; i < 4; ++i) {
