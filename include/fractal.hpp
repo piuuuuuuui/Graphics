@@ -11,8 +11,6 @@ class Fractal : public Group {
   Fractal(const vector<Affine3d> &transforms, Object3D *obj) {
     addObject(obj);
     for (auto tr : transforms) {
-      objects.push_back(new Transform(tr, this));
-      ++num_objects;
       vector<Eigen::Vector4d> cols;
       Eigen::EigenSolver<Matrix4d> es(tr.matrix());
       for (int i = 0; i < 4; ++i) {
@@ -26,12 +24,13 @@ class Fractal : public Group {
       Eigen::VectorXd x =
           A.colPivHouseholderQr().solve(bbox.center().homogeneous());
       Vector3d fixed = (A * x).hnormalized();
-      double r = (fixed - bbox.min())
-                     .cwiseAbs()
-                     .cwiseMax((fixed - bbox.max()).cwiseAbs())
-                     .norm();
+      double r = (fixed - bbox.min()).cwiseAbs().cwiseMax((fixed - bbox.max()).cwiseAbs()).norm();
       bbox.min() = fixed - Vector3d::Constant(r);
       bbox.max() = fixed + Vector3d::Constant(r);
+    }
+    for (auto tr : transforms) {
+      objects.push_back(new Transform(tr, this));
+      ++num_objects;
     }
   }
 
